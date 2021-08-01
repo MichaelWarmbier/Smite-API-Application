@@ -4,14 +4,14 @@
   "description": "An application that allows you to access the Smite API with ease.",
   "main": "SAP.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "SAP": "SAP.js",
+    "SAP": "SAP.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MichaelWarmbier/Smite-API-Application.git",
+    "url": "git+https://github.com/MichaelWarmbier/Smite-API-Application.git"
   },
   "keywords": [
     "Smite",
