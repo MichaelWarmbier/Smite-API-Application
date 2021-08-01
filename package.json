@@ -8,7 +8,7 @@
   },
   "scripts": {
     "SAP": "node SAP.js";
-  }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MichaelWarmbier/Smite-API-Application.git"
