@@ -15,7 +15,8 @@ var input = ''; var devId = ''; var authKey = '';
 
 // main
 
-console.log("Use ctrl + c to exit\n\n")
+console.log("\x1b[42m%s\x1b[0m", "Smite API Application V.1");
+console.log("Use ctrl + c to exit\n\n");
 
 setTimeout(async function() {
   resp = await fetch(smiteAPI + 'pingjson');
@@ -61,41 +62,6 @@ function createSession() {
 
   const signature = md5(devId + 'createsession' + authKey + getTimeStamp());
   return smiteAPI + 'createsessionjson/' + devId + '/' + signature + '/' + getTimeStamp();
-
-}
-
-async function getInfo(info) {
-
-  let failure = false;
-  const signature = md5(devId + 'get' + info + authKey + getTimeStamp());
-
-  let resp = await fetch(createSession());
-  let data = await resp.json();
-  let sID= data.session_id;
-
-  if (sID.length < 2) { sID = "Error grabbing session."; failure = true; }
-
-  console.log("\x1b[42m%s\x1b[0m", "SmiteAPI get" + info);
-  console.log('\x1b[31m%s\x1b[0m', '\nSESSION ID = '); console.log(sID); // Log valid session ID
-  console.log('\n\x1b[31m%s\x1b[0m', 'URL = '); console.log(smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1\n\n') // log final link
-
-  try {
-    resp = await fetch(smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1');
-    data = await resp.json();
-  }
-  catch (err) {
-    console.log("Invalid response. Check server status and credentials and try again.");
-    failure = true;
-  }
-
-  if (failure) console.log("Unable to grab " + info + " information.\n")
-  else {
-    output = JSON.stringify(data);
-    fs.writeFile("output/" + info + ".json", output, function (err) {
-      if (err) return console.log(err);
-    })
-    console.log(info + ".json created successfully.");
-  }
 
 }
 
