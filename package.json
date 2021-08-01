@@ -4,7 +4,7 @@
   "description": "An application that allows you to access the Smite API with ease.",
   "main": "SAP.js",
   "scripts": {
-    "SAP": "node SAP.js"
+    "start": "node SAP.js"
   },
   "repository": {
     "type": "git",
