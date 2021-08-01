@@ -2,12 +2,10 @@
   "name": "smite-api",
   "version": "1.0.0",
   "description": "An application that allows you to access the Smite API with ease.",
-  "main": "SAP.js",
+  "main": "src/index.js",
+  "bin": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "bin": {
-    "SAP": "SAP.js"
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
