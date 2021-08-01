@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "scripts": {
+    "SAP": "node SAP.js";
+  }
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MichaelWarmbier/Smite-API-Application.git"
