@@ -36,7 +36,7 @@ setTimeout(async function() {
 }, 2000)
 
 setTimeout(async function() { getInfo('items'); }, 2000);
-setTimeout(async function() { getGods('gods'); }, 2000);
+setTimeout(async function() { getInfo('gods'); }, 2000);
 
 // methods
 
@@ -91,7 +91,7 @@ async function getInfo(info) {
   if (failure) console.log("Unable to grab " + info + " information.\n")
   else {
     output = JSON.stringify(data);
-    fs.writeFile(info + '.json', output, function (err) {
+    fs.writeFile("output/" + info + ".json", output, function (err) {
       if (err) return console.log(err);
     })
     console.log(info + ".json created successfully.");
@@ -99,10 +99,12 @@ async function getInfo(info) {
 
 }
 
-async function getItems() {
+async function getInfo(info) {
+
+  if (info != "gods"  && info != "items") { console.log("Error. getInfo() used improperly. Argument should be either gods or items. "); return; }
 
   let failure = false;
-  const signature = md5(devId + 'getitems' + authKey + getTimeStamp());
+  const signature = md5(devId + 'get' + info + authKey + getTimeStamp());
 
   let resp = await fetch(createSession());
   let data = await resp.json();
@@ -112,10 +114,10 @@ async function getItems() {
 
   console.log("\x1b[42m%s\x1b[0m", "SmiteAPI GetItems");
   console.log('\x1b[31m%s\x1b[0m', '\nSESSION ID = '); console.log(sID); // Log valid session ID
-  console.log('\n\x1b[31m%s\x1b[0m', 'URL = '); console.log(smiteAPI + 'getitems' + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1\n\n') // log final link
+  console.log('\n\x1b[31m%s\x1b[0m', 'URL = '); console.log(smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1\n\n') // log final link
 
   try {
-    resp = await fetch(smiteAPI + 'getitems' + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1');
+    resp = await fetch(smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1');
     data = await resp.json();
   }
   catch (err) {
@@ -123,49 +125,13 @@ async function getItems() {
     failure = true;
   }
 
-  if (failure) console.log("Unable to grab item information.\n")
+  if (failure) console.log("Unable to grab " + info + " information.\n")
   else {
     output = JSON.stringify(data);
-    fs.writeFile('items.json', output, function (err) {
+    fs.writeFile(info + ".json", output, function (err) {
       if (err) return console.log(err);
     })
-    console.log("items.json created successfully.");
-  }
-
-}
-
-
-async function getGods() {
-
-  let failure = false;
-  const signature = md5(devId + 'getgods' + authKey + getTimeStamp());
-
-  let resp = await fetch(createSession());
-  let data = await resp.json();
-  let sID= data.session_id;
-
-  if (sID.length < 2) { sID = "Error grabbing session."; failure = true; }
-
-  console.log("\x1b[42m%s\x1b[0m", "SmiteAPI GetGods");
-  console.log('\x1b[31m%s\x1b[0m', '\nSESSION ID = '); console.log(sID); // Log valid session ID
-  console.log('\n\x1b[31m%s\x1b[0m', 'URL = '); console.log(smiteAPI + 'getgods' + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1') // log final link
-
-  try {
-    resp = await fetch(smiteAPI + 'getgods' + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1');
-    data = await resp.json();
-  }
-  catch (err) {
-    console.log("Invalid response. Check server status and credentials and try again.");
-    failure = true;
-  }
-
-  if (failure) console.log("\nUnable to grab god information.")
-  else {
-    output = JSON.stringify(data);
-    fs.writeFile('gods.json', output, function (err) {
-      if (err) return console.log(err);
-    })
-    console.log("gods.json created successfully.");
+    console.log(info + ".json created successfully.");
   }
 
 }

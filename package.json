@@ -1,0 +1,30 @@
+{
+  "name": "smite-api",
+  "version": "1.0.0",
+  "description": "An application that allows you to access the Smite API with ease.",
+  "main": "SAP.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MichaelWarmbier/Smite-API-Application.git"
+  },
+  "keywords": [
+    "Smite",
+    "Hi-Rez",
+    "API"
+  ],
+  "author": "Michael Warmbier",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MichaelWarmbier/Smite-API-Application/issues"
+  },
+  "homepage": "https://github.com/MichaelWarmbier/Smite-API-Application#readme",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "md5": "^2.3.0",
+    "node-fetch": "^2.6.1",
+    "prompt-sync": "^4.2.0"
+  }
+}
