@@ -94,7 +94,7 @@ async function getInfo(info) {
   if (failure) console.log("Unable to grab " + info + " information.\n")
   else {
     output = JSON.stringify(data);
-    fs.writeFile(info + ".json", output, function (err) {
+    fs.writeFile('output/' + info + '.json', output, function (err) {
       if (err) return console.log(err);
     })
     console.log(info + ".json created successfully.");
