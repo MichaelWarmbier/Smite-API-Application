@@ -3,13 +3,7 @@ A Node based application designed to make accessing the Smite API easier.
 
 ## Using application through Repl.it
 
-Visit [this location](https://replit.com/@Kirbout/Smite-API-Application) to view the repository for this function on replit.com
-
-On the right-side preivew screen, select either the **console** or the **shell** option and enter the following command:
-
-`node smite-api.js` 
-
-Then, use the program like normally. Updated files will be located in the output folder.
+Visit [this location](https://replit.com/@Kirbout/Smite-API-Application) and run the application that way. See "Using the application" below.
 
 ## Installation
 
