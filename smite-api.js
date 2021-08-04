@@ -78,7 +78,7 @@ async function getInfo(info) {
 
   if (sID.length < 2) { sID = "Error grabbing session."; failure = true; }
 
-  console.log("\x1b[42m%s\x1b[0m", "SmiteAPI GetItems");
+  console.log("\x1b[42m%s\x1b[0m", "SmiteAPI Get" + info);
   console.log('\x1b[31m%s\x1b[0m', '\nSESSION ID = '); console.log(sID); // Log valid session ID
   console.log('\n\x1b[31m%s\x1b[0m', 'URL = '); console.log(smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1\n\n') // log final link
 
