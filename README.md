@@ -1,9 +1,13 @@
 # Smite-API-Application
-A Node based application designed to make accessing the Smite API easier.
+A Node application designed to make accessing the Smite API easier, using this tool.
+
+## Information
+
+This is a work in progress application. The code and features will be overhauled in the future. Feel free to suggest reasonable additions, I'd really like to flesh this one out.
 
 ## Using application through Repl.it
 
-Visit [this location](https://replit.com/@Kirbout/Smite-API-Application) and run the application that way. See "Using the application" below.
+Visit [this location](https://replit.com/@Kirbout/Smite-API-Application) and run the application that way. View the code for the file output. See "Using the application" below.
 
 ## Installation
 
