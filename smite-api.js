@@ -2,22 +2,35 @@
 
 /* Packages */
 
-var md5 = require('md5'); // npm install md5
-var fetch = require('node-fetch'); // npm install node-fetch
-var prompt = require('prompt-sync')({sigint: true}); // npm install prompt-sync
-var fs = require('fs'); // npm install fs
+var md5 = require('md5');
+var fetch = require('node-fetch'); 
+var prompt = require('prompt-sync')({sigint: true}); 
+var fs = require('fs'); 
+
+/* Secrets [Only works on Replit] */
+
+const username = process.env['usrname'];
+const password = process.env['pswd'];
+const s_devId = process.env['devID']
+const s_authKey = process.env['key']
+ 
+/* Variables */
 
 var orange = "\x1b[33m%s\x1b[0m";
 var green = "\x1b[32m%s\x1b[0m";
 var blue = "\x1b[34m%s\x1b[0m";
 var red = "\x1b[31m%s\x1b[0m";
 var purple = "\n\x1b[35m%s\x1b[0m";
+var cyan = "\n\x1b[36m%s\x1b[0m"
 
-/* Variables & Constants */
+const smiteAPI = "https://api.smitegame.com/smiteapi.svc/";
+var platform = "PC";
+const conquestID = "450";
 
-const smiteAPI = 'https://api.smitegame.com/smiteapi.svc/';
-const conquestID = '450';
-var input = ''; var devId = ''; var authKey = '';
+var input = null; 
+var devId = null; 
+var authKey = null;
+var sID = null;
 
 /* Main Loop */
 
@@ -26,116 +39,185 @@ main();
 
 async function main() {
 
-  // Introduce
+  let validInput = false;
   console.log(orange, "Use ctrl + c to exit at any time.\n");
-  input = prompt("Enter your developer ID: "); devId = input;
-  input = prompt("Enter your authentication key: "); authKey = input;
 
-do {
-
-  let firstInput = await '';
-  let secondInput = await '';
+  do {
+    // Login
+    input = prompt("Enter your developer ID: "); devId = input;
+    input = prompt("Enter your authentication key: "); authKey = input;
   
-  // Ping server
-  console.log(blue, "\nPinging server..");
-  resp = await fetch(smiteAPI + 'pingjson');
-  data = await resp.json();
-  console.log(data);
+    // Check for ownership credentials
+    if (devId == username && authKey == password) {
+      console.log(green, "Successfully logged in as owner.");
+      devId = s_devId;
+      authKey = s_authKey;
+    }
 
-  if (data.indexOf("Ping successful") == -1) 
-    console.log(red, "Ping unsuccessful. Unable to access SmiteAPI");
+    // Login verification
+    let resp = await fetch(createSession());
+    let data = await resp.json();
+    if (data.ret_msg == "Approved") {
+      sID = await data.session_id;
+      validInput = true;
+    }
+    else 
+      console.log(red, "\nERROR: Invalid credentials.\n")
+    
+  } while(!validInput) 
 
-  // Prompt user
-  console.log(blue, "\nRun which of the following commands?");
-  console.log("[1] - Get god data\n[2] - Get item data\n"); 
-  firstInput = prompt('');
+  console.log(green, "\nSession established.");
+  console.log(red, "\n[WARNING]: New session will\nneed to be established in 15 minutes.\n")
+  console.log(blue, "Pinging server..");
 
-  console.log(blue, "Choose one of the following:");
-  console.log("[1] - Save as file\n[2] - Output as link\n[3] - Both\n");
-  secondInput = prompt('');
+  do {
+    
+    let firstInput = await '';
+    let secondInput = await '';
+  
+    // Ping server
+    resp = await fetch("https://api.smitegame.com/smiteapi.svc/pingjson");
+    data = await resp.json();
+    console.log(orange, data);
+    console.log(orange, "[Platform]: " + platform)
 
-  if (secondInput > 3 || secondInput < 1) firstInput = -1;
+    if (data.indexOf("Ping successful") == -1) 
+      console.log(red, "Ping unsuccessful. Unable to access SmiteAPI");
 
-  // Determine results
-  switch (firstInput) {
-    // GetGods
-    case '1': 
-      try {
-        await getInfo('gods', secondInput); 
-      }
-      catch (err) { console.log(red, "Error: " + err); }
-    break;
-    // GetItems
-    case '2':
-      try {
-      await getInfo('items', secondInput); 
-      }
-      catch (err) { console.log(red, "Error: " + err); }
-    break;
-    default: console.log(red, "Invalid option selected"); break;
-  }
+    // Prompt user
+    console.log(blue, "\nRun which of the following commands?");
+    console.log("[1] - Get Server Status");
+    console.log("[2] - Get Data Used");
+    console.log("[3] - Get God Data");
+    console.log("[4] - Get Item Data");
+    firstInput = prompt("[SELECTION]: ");
 
-} while (1);
+    if (firstInput != '2') {
+      // Secondary Prompt
+      console.log(blue, "Choose one of the following:");
+      console.log("[1] - Save as File");
+      console.log("[2] - Output as Link");
+      console.log("[3] - Both");
+      secondInput = prompt("[SELECTION]: ");
+      
+      // Bound
+      if (secondInput > 3 || secondInput < 1) firstInput = -1;
+    }
+    
+    // Hande Input
+    switch (firstInput) {
+      // GetHirezServerStatus
+      case '1': 
+        try {
+          await getHirezServerStatus(secondInput);
+        }
+        catch (err) { console.log(red, "ERROR: " + err); }
+      break;
+      // GetDataUsed
+      case '2': 
+        await getDataUsed();
+      break;
+      // GetGods
+      case '3': 
+        try {
+          await getInfo("gods", secondInput); 
+        }
+        catch (err) { console.log(red, "ERROR: " + err); }
+      break;
+      // GetItems
+      case '4':
+        try {
+          await getInfo("items", secondInput); 
+        }
+        catch (err) { console.log(red, "ERROR: " + err); }
+      break;
+        
+      default: console.log(red, "ERROR: Invalid option selected"); break;
+    }
+
+  } while (1);
 }
 
-/* Utility Methods */
+/* Parameter Methods */
 
+
+// is this really the best method of doing this??
 function getTimeStamp() {
 
-  const ts = new Date();
+  const date = new Date();
   let year, month, day, hour, minute, second;
 
-  year = ts.getUTCFullYear();
-  if (ts.getUTCMonth() < 10) month = '0' + (ts.getUTCMonth() + 1); else month = ts.getUTCMonth() + 1;
-  if (ts.getUTCDate() < 10) day = '0' + ts.getUTCDate(); else day = ts.getUTCDate();
-  if (ts.getUTCHours() < 10) hour = '0' + ts.getUTCHours(); else hour = ts.getUTCHours();
-  if (ts.getUTCMinutes() < 10) minute = '0' + ts.getUTCMinutes(); else minute = ts.getUTCMinutes();
-  if (ts.getUTCSeconds() < 10) second = '0' + ts.getUTCSeconds(); else second = ts.getUTCSeconds();
+  year = date.getUTCFullYear();
+  if (date.getUTCMonth() < 10) month = '0' + (date.getUTCMonth() + 1); 
+  else month = date.getUTCMonth() + 1;
+  if (date.getUTCDate() < 10) day = '0' + date.getUTCDate(); 
+  else day = date.getUTCDate();
+  if (date.getUTCHours() < 10) hour = '0' + date.getUTCHours(); 
+  else hour = date.getUTCHours();
+  if (date.getUTCMinutes() < 10) minute = '0' + date.getUTCMinutes(); 
+  else minute = date.getUTCMinutes();
+  if (date.getUTCSeconds() < 10) second = '0' + date.getUTCSeconds(); 
+  else second = date.getUTCSeconds();
 
-
-  return year + month + day + hour + minute + second;
+  return '' + year + month + day + hour + minute + second;
 
 }
 
 function createSession() {
-
-  const signature = md5(devId + 'createsession' + authKey + getTimeStamp());
-  return smiteAPI + 'createsessionjson/' + devId + '/' + signature + '/' + getTimeStamp();
-
+  const signature = md5(devId + "createsession" + authKey + getTimeStamp());
+  return smiteAPI + "createsessionjson/" + devId + '/' + signature + '/' + getTimeStamp();
 }
 
 /* Primary Methods */
 
 async function getInfo(info, code) {
-
-  let failure = false;
-  const signature = md5(devId + 'get' + info + authKey + getTimeStamp());
-
-  let resp = await fetch(createSession());
-  let data = await resp.json();
-  let sID = await data.session_id;
-
-  if (sID.length < 2) { console.log(red,"Attempt to access API failed. Invalid credentials?\n"); return; }
-
-  console.log(green, "SmiteAPI Get" + info);
-
-  let link = (smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' +     sID + '/' + getTimeStamp() + '/' + '1')
-  // Link
+  const signature = md5(devId + "get" + info + authKey + getTimeStamp());
+  console.log(cyan, "[API CALL]: /get" + info);
+  let link = (smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1')
   if (code == 2 || code == 3) {
-    console.log(purple, 'URL = '); console.log(link + '\n') 
+    console.log(purple, 'URL = ' + link + '\n');
   }
-  // Grab
   resp = await fetch(link);
   data = await resp.json();
-
-  // File
-   
   if (code == 1 || code == 3) {
     output = JSON.stringify(data);
-    fs.writeFile('output/' + info + '.json', output, function (err) {
-      if (err) return console.log(err);
+    fs.writeFile(info + '.json', output, function (err) {
+        if (err) return console.log(red, err);
       })
       console.log(orange, info + ".json created successfully.\n");
   }
+  return link;
 
+}
+
+/////////////////
+
+async function getHirezServerStatus(code) {
+  const signature = md5(devId + 'gethirezserverstatus' + authKey + getTimeStamp());
+  console.log(cyan, "[API CALL]: /gethirezserverstatus");
+  let link = smiteAPI + "gethirezserverstatusjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp();
+  if (code == 2 || code == 3) {
+    console.log(purple, "URL = " + link + '\n');
+  }
+  resp = await fetch(link);
+  data = await resp.json();
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile("HirezSatus" + getTimeStamp() + ".json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+      console.log(orange, "HirezStatus" + getTimeStamp() + ".json created successfully.\n");
+  }
+  return link;
+}
+
+/////////////////
+
+async function getDataUsed() {
+  const signature = md5(devId + 'getdataused' + authKey + getTimeStamp());
+  console.log(cyan, "[API CALL]: /getdataused");
+  let link = smiteAPI + "getdatausedjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp();
+  console.log(purple, "SESSION = " + sID);
+  console.log(purple, "URL = " + link + '\n');
+  return link;
 }
