@@ -188,8 +188,12 @@ async function getInfo(info, code) {
   if (code == 2 || code == 3) {
     console.log(purple, 'URL = ' + link + '\n');
   }
-  resp = await fetch(link);
-  data = await resp.json();
+
+  try {
+    resp = await fetch(link);
+    data = await resp.json();
+  } catch (e) { console.log (red, "\nERROR: Unable to fetch information.\n\n" + e)}
+
   if (code == 1 || code == 3) {
     output = JSON.stringify(data);
     fs.writeFile(info + '.json', output, function (err) {
@@ -208,8 +212,10 @@ async function getPlayer(flag, code, player) {
   const signature = md5(devId + 'getplayer' + authKey + getTimeStamp());
   let link = smiteAPI + "getplayerjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + encodeURI(player);
 
-  resp = await fetch(link);
-  data = await resp.json();
+  try {
+    resp = await fetch(link);
+    data = await resp.json();
+  } catch (e) { console.log (red, "\nERROR: Unable to fetch information. If using special characters, see the README.md for help.\n\n" + e)}
 
   if (data[0] == null) {
     console.log(red, "\nERROR: Invalid player.\n")
@@ -243,8 +249,12 @@ async function getHirezServerStatus(code) {
   if (code == 2 || code == 3) {
     console.log(purple, "URL = " + link + '\n');
   }
-  resp = await fetch(link);
-  data = await resp.json();
+
+  try {
+    resp = await fetch(link);
+    data = await resp.json();
+  } catch (e) { console.log (red, "\nERROR: Unable to fetch information.\n\n" + e)}
+  
   if (code == 1 || code == 3) {
     output = JSON.stringify(data);
     fs.writeFile("HirezSatus" + getTimeStamp() + ".json", output, function (err) {
@@ -261,6 +271,11 @@ async function getDataUsed() {
   const signature = md5(devId + 'getdataused' + authKey + getTimeStamp());
   console.log(cyan, "[API CALL]: /getdataused");
   let link = smiteAPI + "getdatausedjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp();
+
+  try {
+    resp = await fetch(link);
+  } catch (e) { console.log (red, "\nERROR: Unable to fetch information.\n\n" + e)}
+  
   console.log(purple, "SESSION = " + sID);
   console.log(purple, "URL = " + link + '\n');
   return;
