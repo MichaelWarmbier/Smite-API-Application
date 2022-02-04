@@ -35,6 +35,10 @@ Utilizes the following packages:
 
 **A.** Any questions, concerns or issues can be reported to me on the official GitHub repository's [issue page](https://github.com/MichaelWarmbier/Smite-API-Application/issues). You can also email me for better results at business@michaelwarmbier.com.
 
+**Q.** My name contains special characters and won't work, what do I do?
+
+**A.** The easiest way to deal with this is to type in a dummy name during the "Name of player you wish to use" prompt, then to edit the URL manually by changing the name at the end.
+
 ## Planned Features
 
 The following API methods are planned to be implemented in the future:
@@ -50,7 +54,6 @@ The following API methods are planned to be implemented in the future:
 /getleagueseasons<br>
 /getmatchhistory<br>
 /getmotd<br>
-/getplayer<br>
 /getplayerstatus<br>
 /getqueuestats<br>
 /gettopmatches<br>
@@ -107,3 +110,5 @@ If you run this application through Repl, you may have to fork the project befor
 **/getitems** - Returns information about all items in the game.<br>
 
 **/getgods** - Returns information about all gods in the game.<br>
+
+**/getplayer** - Returns information about a specific player.<br>
