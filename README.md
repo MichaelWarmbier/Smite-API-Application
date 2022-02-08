@@ -1,5 +1,5 @@
 # Smite-API-Application
-A Node-based application designed to make it possible to access the Smite API possible through a user interface.
+A Node.js based application designed to provide a basic CLI interface that allows user to access the Smite API (with their own provided credentials) and retrieve information without going through the process of coding their own wrappers and applications.
 
 **Current Version:** Beta 1.0
 
@@ -35,15 +35,16 @@ Utilizes the following packages:
 
 **A.** Any questions, concerns or issues can be reported to me on the official GitHub repository's [issue page](https://github.com/MichaelWarmbier/Smite-API-Application/issues). You can also email me for better results at business@michaelwarmbier.com.
 
+---
+
 **Q.** My name contains special characters and won't work, what do I do?
 
-**A.** The easiest way to deal with this is to type in a dummy name during the "Name of player you wish to use" prompt, then to edit the URL manually by changing the name at the end.
+**A.** The easiest way to deal with this is to type in a dummy name during the "Name of player you wish to use" prompt, then to edit the URL manually by changing the name at the end. I'm currently working on a workaround to this, so this answer will be changed.
 
 ## Planned Features
 
 The following API methods are planned to be implemented in the future:
 
-/getpatchinfo<br>
 /getfriends<br>
 /getgodranks<br>
 /getgodleaderboard<br>
@@ -53,7 +54,6 @@ The following API methods are planned to be implemented in the future:
 /getleagueleaderboard<br>
 /getleagueseasons<br>
 /getmatchhistory<br>
-/getmotd<br>
 /getplayerstatus<br>
 /getqueuestats<br>
 /gettopmatches<br>
@@ -101,14 +101,16 @@ If you run this application through Repl, you may have to fork the project befor
 
 ### Currently supported API calls:
 
-**/ping** - Always run on application start up. Displays the status of the API. If the API is down, none of the other calls will run successfully.<br>
+**/gethirezserverstatus** - Outputs link of and/or downloads JSON data relating to the concurrent status of the Hi-Rez Smite servers on all platforms. Saves files with timestamp. <br>
 
-**/gethirezserverstatus** - Returns the server status of all releases of the game. Saves file with YYDDMMhhmmss timestamp.<br>
+**/getdataused** - Outputs link to JSON data relating to the API limits associated with the provided devId. <br>
 
-**/getdataused** - Returns API Developer daily usage limits and the current status against those limits. Only outputs current session and a link. <br>
+**/getitems** - Outputs link of and/or downloads JSON data relating to the current patch version for items within the game. <br>
 
-**/getitems** - Returns information about all items in the game.<br>
+**/getgods** - Outputs link of and/or downloads JSON data for the Gods within the game.<br>
 
-**/getgods** - Returns information about all gods in the game.<br>
+**/getplayer** - Outputs link of and/or downloads JSON data relating to a specific player. <br>
 
-**/getplayer** - Returns information about a specific player.<br>
+**/getpatchinfo** - Outputs link of and/or downloads JSON data relating to the current patch version for the Smite game.
+
+**/getmotd** - Outputs link of and/or downloads JSON data relating to the twenty most recent modes of the day.
