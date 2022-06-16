@@ -1,2 +1,2 @@
-Klanguage = "nodejs"
+language = "nodejs"
 run = "node smite-api.js"

@@ -1,20 +1,22 @@
 #!/usr/bin/env node
 
-/* Packages */
+/*////////// Packages //////////*/
 
 var md5 = require('md5');
 var fetch = require('node-fetch'); 
 var prompt = require('prompt-sync')({sigint: true}); 
 var fs = require('fs'); 
 
-/* Secrets [Only works on Replit] */
+const godData = require('./gods.json');
+
+/*////////// Secrets (Replit only) //////////*/
 
 const username = process.env['usrname'];
 const password = process.env['pswd'];
 const s_devId = process.env['devID']
 const s_authKey = process.env['key']
  
-/* Variables */
+/*////////// Data //////////*/
 
 const orange = "\x1b[33m%s\x1b[0m";
 const green = "\x1b[32m%s\x1b[0m";
@@ -24,6 +26,7 @@ const purple = "\n\x1b[35m%s\x1b[0m";
 const cyan = "\n\x1b[36m%s\x1b[0m"
 
 const smiteAPI = "https://api.smitegame.com/smiteapi.svc/";
+
 var platform = "PC";
 
 var input = null; 
@@ -31,13 +34,14 @@ var devId = null;
 var authKey = null;
 var sID = null;
 
-/* Main Loop */
+/*////////// Main Loop //////////*/
 
 console.log(green, "Smite API Application");
 main();
 
 async function main() {
 
+  let menuInput = await '';
   let firstInput = await '';
   let secondInput = await '';
   let thirdInput = await '';
@@ -85,16 +89,35 @@ async function main() {
       console.log(red, "Ping unsuccessful. Unable to access SmiteAPI");
 
     // Prompt user
-    console.log(blue, "\nRun which of the following commands?");
-    console.log("[1] - Get Server Status");
-    console.log("[2] - Get Data Used");
-    console.log("[3] - Get God Data");
-    console.log("[4] - Get Item Data");
-    console.log("[5] - Get Player Data")
-    console.log("[6] - Get Patch Info")
-    firstInput = prompt("[SELECTION]: ");
+    console.log(blue, "\nEnter which menu?");
+    console.log("[1] - Player Methods");
+    console.log("[2] - God and Item Methods");
+    console.log("[3] - Other Methods");
+    menuInput = prompt("[SELECTION]: ");
 
-    if (firstInput != '2') {
+    console.log(blue, "\nRun which of the following commands?");
+    switch (menuInput) {
+      case '1': {
+        console.log("[1] - Get Player Data");
+        console.log("[2] - Get Friend/Blocked Data");
+        break;
+      }
+      case '2': {
+        console.log("[1] - Get God Data");
+        console.log("[2] - Get Item Data");
+        console.log("[3] - Get God Skin Data");
+        break;
+      }
+      case '3': {
+        console.log("[1] - Get Server Status");
+        console.log("[2] - Get Patch Info");
+        console.log("[3] - Get Data Used");
+        break;
+      }
+    }
+    firstInput = await prompt("[SELECTION]: ");
+
+    if (menuInput != 3 || firstInput != '3') {
       // Secondary Prompt
       console.log(blue, "\nChoose one of the following:");
       console.log("[1] - Save as File");
@@ -104,21 +127,41 @@ async function main() {
       if (secondInput > 3 || secondInput < 1) firstInput = -1;
     }
 
-    if (firstInput == '5') {
-      console.log (blue, "\nName of player you wish to use:")
+    // Tertiary Prompt -- playername
+    if (menuInput == 1) {
+      console.log (blue, "\nEnter the name of the player:")
+      thirdInput = prompt("[NAME]: ");
+    }
+
+    // Tertiary Prompt -- godname
+    if (menuInput == 2 && firstInput == 3) {
+      console.log (blue, "\nEnter the name of the God:")
       thirdInput = prompt("[NAME]: ");
     }
     
     // Hande Input
     try {
-      switch (firstInput) {
-        case '1': await getHirezServerStatus(secondInput); break;
-        case '2': await getDataUsed(); break;
-        case '3': await getInfo("gods", secondInput); break;
-        case '4': await getInfo("items", secondInput); break;
-        case '5': await getPlayer(1, secondInput, thirdInput); break;
-        case '6': await getPatchInfo(secondInput); break;
-        case '7': await getMOTD(secondInput); break;
+      switch (menuInput) {
+        case '1': {
+          if (firstInput == '1') await getPlayer(1, secondInput, thirdInput);
+          else if (firstInput == '2') await getFriends(1, secondInput, thirdInput);
+          else console.log(red, "ERROR: Invalid option selected");
+          break;
+        }
+        case '2': {
+          if (firstInput == '1') await getInfo("gods", secondInput);
+          else if (firstInput == '2') await getInfo("items", secondInput);
+          else if (firstInput == '3') await getGodSkins(secondInput, thirdInput);
+          else console.log(red, "ERROR: Invalid option selected");
+          break;
+        }
+        case '3': {
+          if (firstInput == '1') await getHirezServerStatus(secondInput);
+          else if (firstInput == '2') await getPatchInfo(secondInput);
+          else if (firstInput == '3') await getDataUsed();
+          else console.log(red, "ERROR: Invalid option selected");
+          break;
+        }
         default: console.log(red, "ERROR: Invalid option selected"); break;
       }
     } catch(e) { 
@@ -129,8 +172,7 @@ async function main() {
   } while (1);
 }
 
-/* Utility Methods
-These functions are used for grabbing specific information that is used as a parameter for the primary ones, with the exception of getplayer() which acts as both. */
+/*////////// Utility Methods //////////*/
 
 function getTimeStamp() {
 
@@ -158,7 +200,7 @@ function createSession() {
   return smiteAPI + "createsessionjson/" + devId + '/' + signature + '/' + getTimeStamp();
 }
 
-/* Primary Methods (wrappers) */
+/*////////// Primary Methods //////////*/
 
 async function getInfo(info, code) {
   const signature = md5(devId + "get" + info + authKey + getTimeStamp());
@@ -184,7 +226,7 @@ async function getInfo(info, code) {
 
 }
 
-//////////////////
+// getPlayer()
 
 
 async function getPlayer(flag, code, player) {
@@ -197,7 +239,11 @@ async function getPlayer(flag, code, player) {
   data = await resp.json();
 
   if (data[0] == null) {
-    console.log(red, "\nERROR: Invalid player.\n")
+    console.log(red, "\nERROR: Invalid player.\n");
+    return;
+  }
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+    console.log(red, "\nERROR: Player profile set to private.\n");
     return;
   }
 
@@ -217,7 +263,7 @@ async function getPlayer(flag, code, player) {
 
 }
 
-/////////////////
+// getHirezServerStatus()
 
 async function getHirezServerStatus(code) {
   
@@ -241,7 +287,7 @@ async function getHirezServerStatus(code) {
   return;
 }
 
-/////////////////
+// getDataUsed()
 
 async function getDataUsed() {
   
@@ -257,7 +303,7 @@ async function getDataUsed() {
   return;
 }
 
-/////////////////
+// getPatchInfo()
 
 async function getPatchInfo(code) {
   
@@ -282,7 +328,7 @@ async function getPatchInfo(code) {
   
 }
 
-/////////////////
+// getMOTD() -- ADD LATER
 
 async function getMOTD(code) {
 
@@ -303,4 +349,73 @@ async function getMOTD(code) {
   }
   return;
   
+}
+
+// getFriends()
+
+async function getFriends(flag, code, player) {
+  
+  const signature = md5(devId + 'getfriends' + authKey + getTimeStamp());
+  
+  let link = smiteAPI + "getfriendsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + encodeURI(player);
+
+  resp = await fetch(link);
+  data = await resp.json();
+
+  if (data[0] == null) {
+    console.log(red, "\nERROR: Invalid player.\n");
+    return;
+  }
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+    console.log(red, "\nERROR: Player profile set to private.\n");
+    return;
+  }
+
+  if (flag) {
+    console.log(cyan, "[API CALL]: /getfriends");
+    if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+  }
+
+  if ((code == 1 || code == 3) && flag) {
+    output = JSON.stringify(data);
+    fs.writeFile(player + "_friends.json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, player + "_friends.json created successfully.\n");
+  }
+  return data[0].Id;
+
+}
+
+// getGodSkins() 
+
+async function getGodSkins(code, god) {
+  
+  const signature = md5(devId + 'getgodskins' + authKey + getTimeStamp());
+  let godID = null;
+
+  for (let i = 0; i < godData.length; i++)
+    if (godData[i].Name.toLowerCase() == god.toLowerCase())
+      godID = godData[i].id;
+
+  if (godID == null) {
+    console.log(red, "\nERROR: God name not found.\n");
+    return;
+  }
+  
+  let link = smiteAPI + "getgodskinsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + godID + '/1';
+
+  resp = await fetch(link);
+  data = await resp.json();
+
+  console.log(cyan, "[API CALL]: /getgodskins");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+
+  output = JSON.stringify(data);
+  fs.writeFile(god + "_skins.json", output, function (err) {
+      if (err) return console.log(red, err);
+    })
+  console.log(orange, god + "_skins.json created successfully.\n");
+  return data[0].Id;
+
 }
