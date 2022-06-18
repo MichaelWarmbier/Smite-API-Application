@@ -7,8 +7,6 @@ var fetch = require('node-fetch');
 var prompt = require('prompt-sync')({sigint: true}); 
 var fs = require('fs'); 
 
-const godData = require('./gods.json');
-
 /*////////// Secrets (Replit only) //////////*/
 
 const username = process.env['usrname'];
@@ -41,10 +39,11 @@ main();
 
 async function main() {
 
-  let menuInput = await '';
-  let firstInput = await '';
-  let secondInput = await '';
-  let thirdInput = await '';
+  let menuInput = '';
+  let firstInput = '';
+  let secondInput = '';
+  let thirdInput = '';
+  let fourthInput = '';
   let validInput = false;
   
   console.log(orange, "Use ctrl + c to exit at any time.\n");
@@ -92,23 +91,40 @@ async function main() {
     console.log(blue, "\nEnter which menu?");
     console.log("[1] - Player Methods");
     console.log("[2] - God and Item Methods");
-    console.log("[3] - Other Methods");
+    console.log("[3] - Match Methods")
+    console.log("[4] - Other Methods");
     menuInput = prompt("[SELECTION]: ");
 
-    console.log(blue, "\nRun which of the following commands?");
+    if (menuInput >= 1 && menuInput <= 4)
+      console.log(blue, "\nRun which of the following commands?");
+    else {
+      console.log(red, "\nERROR: Invalid option selected.\n");
+      continue;
+    }
     switch (menuInput) {
       case '1': {
+        console.log("[b] - Go Back");
         console.log("[1] - Get Player Data");
         console.log("[2] - Get Friend/Blocked Data");
+        console.log("[3] - Get Player Match History");
         break;
       }
       case '2': {
+        console.log("[b] - Go Back");
         console.log("[1] - Get God Data");
         console.log("[2] - Get Item Data");
         console.log("[3] - Get God Skin Data");
+        console.log("[4] - Get God Leaderboard Data");
         break;
       }
       case '3': {
+        console.log("[b] - Go Back");
+        console.log("[1] - Get MOTD Data");
+        console.log("[2] - Get Match Details");
+        break;
+      }
+      case '4': {
+        console.log("[b] - Go Back");
         console.log("[1] - Get Server Status");
         console.log("[2] - Get Patch Info");
         console.log("[3] - Get Data Used");
@@ -116,8 +132,9 @@ async function main() {
       }
     }
     firstInput = await prompt("[SELECTION]: ");
+    if (firstInput == 'b') continue;
 
-    if (menuInput != 3 || firstInput != '3') {
+    if (menuInput != 4 || firstInput != '3') {
       // Secondary Prompt
       console.log(blue, "\nChoose one of the following:");
       console.log("[1] - Save as File");
@@ -134,9 +151,35 @@ async function main() {
     }
 
     // Tertiary Prompt -- godname
-    if (menuInput == 2 && firstInput == 3) {
+    if (menuInput == 2 && (firstInput == 3 || firstInput == 4)) {
       console.log (blue, "\nEnter the name of the God:")
       thirdInput = prompt("[NAME]: ");
+    }
+
+    // Tertiary Prompt -- match_id
+    if (menuInput == 3 && firstInput == 2) {
+      console.log(orange, "\nGo to [Player Methods > Get Player Match History] to get recent match IDs.");
+      console.log(red, "WARNING: Method may be slow, please be patient.");
+      console.log (blue, "Enter the match ID:")
+      thirdInput = prompt("[ID]: ");
+    }
+
+    // Quaterynary Prompt -- Queue Type
+    if (menuInput == 2 && firstInput == 4) {
+      console.log(blue, "\nWhich game mode?");
+      console.log("[1] - Conquest");
+      console.log("[2] - Joust");
+      console.log("[3] - Duel");
+      fourthInput = prompt("[SELECTION]: ");
+      if (!(fourthInput >= 1 && fourthInput <= 3)) {
+        console.log(red, "\nERROR: Invalid option selected.\n");
+        continue;
+      }
+      switch (fourthInput) {
+        case '1': fourthInput = '451'; break;
+        case '2': fourthInput = '450'; break;
+        case '3': fourthInput = '451'; break;
+      }
     }
     
     // Hande Input
@@ -145,28 +188,36 @@ async function main() {
         case '1': {
           if (firstInput == '1') await getPlayer(1, secondInput, thirdInput);
           else if (firstInput == '2') await getFriends(1, secondInput, thirdInput);
-          else console.log(red, "ERROR: Invalid option selected");
+          else if (firstInput == '3') await getMatchHistory(secondInput, thirdInput);
+          else console.log(red, "\nERROR: Invalid option selected\n");
           break;
         }
         case '2': {
           if (firstInput == '1') await getInfo("gods", secondInput);
           else if (firstInput == '2') await getInfo("items", secondInput);
           else if (firstInput == '3') await getGodSkins(secondInput, thirdInput);
-          else console.log(red, "ERROR: Invalid option selected");
+          else if (firstInput == '4') await getGodLeaderboard(secondInput, thirdInput, fourthInput);
+          else console.log(red, "\nERROR: Invalid option selected\n");
           break;
         }
         case '3': {
+          if (firstInput == '1') await getMOTD(secondInput);
+          else if (firstInput == '2') await getMatchDetails(secondInput, thirdInput);
+          else console.log(red, "\nERROR: Invalid option selected\n");
+          break;
+        }
+        case '4': {
           if (firstInput == '1') await getHirezServerStatus(secondInput);
           else if (firstInput == '2') await getPatchInfo(secondInput);
           else if (firstInput == '3') await getDataUsed();
-          else console.log(red, "ERROR: Invalid option selected");
+          else console.log(red, "\nERROR: Invalid option selected\n");
           break;
         }
-        default: console.log(red, "ERROR: Invalid option selected"); break;
+        default: console.log(red, "\nERROR: Invalid option selected\n"); break;
       }
     } catch(e) { 
-      console.log(red, '\n\nERROR: Unable to access API properly.\n\n')
-      console.log(red, "ERROR: " + e); 
+      console.log(red, '\nERROR: Unable to access API properly.\n\n')
+      console.log(red, "\nERROR: " + e + "\nPlease report this bug to the developer.\n"); 
     }
 
   } while (1);
@@ -200,12 +251,26 @@ function createSession() {
   return smiteAPI + "createsessionjson/" + devId + '/' + signature + '/' + getTimeStamp();
 }
 
+/*/////////////////////////////////////*/
+/*/////////////////////////////////////*/
+/*/////////////////////////////////////*/
+/*/////////////////////////////////////*/
+/*/////////////////////////////////////*/
 /*////////// Primary Methods //////////*/
 
-async function getInfo(info, code) {
+async function getInfo(info, code, flag) {
+  
   const signature = md5(devId + "get" + info + authKey + getTimeStamp());
   console.log(cyan, "[API CALL]: /get" +info);
+  
   let link = (smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1')
+
+  if (flag) {
+    resp = await fetch(link);
+    data = await resp.json();
+    return data;
+  }
+  
   if (code == 2 || code == 3) {
     console.log(purple, 'URL = ' + link + '\n');
   }
@@ -222,12 +287,10 @@ async function getInfo(info, code) {
       })
       console.log(orange, info + ".json created successfully.\n");
   }
-  return;
 
 }
 
 // getPlayer()
-
 
 async function getPlayer(flag, code, player) {
   
@@ -259,7 +322,6 @@ async function getPlayer(flag, code, player) {
       })
     console.log(orange, data[0].Name + ".json created successfully.\n");
   }
-  return data[0].Id;
 
 }
 
@@ -284,7 +346,6 @@ async function getHirezServerStatus(code) {
       })
     console.log(orange, "HirezStatus" + getTimeStamp() + ".json created successfully.\n");
   }
-  return;
 }
 
 // getDataUsed()
@@ -300,7 +361,6 @@ async function getDataUsed() {
   
   console.log(purple, "SESSION = " + sID);
   console.log(purple, "URL = " + link + '\n');
-  return;
 }
 
 // getPatchInfo()
@@ -324,11 +384,10 @@ async function getPatchInfo(code) {
       })
     console.log(orange, 'patch.json created successfully.\n');
   }
-  return;
   
 }
 
-// getMOTD() -- ADD LATER
+// getMOTD() /getmotd[ResponseFormat]/{developerId}/{signature}/{session}/{timestamp
 
 async function getMOTD(code) {
 
@@ -383,13 +442,14 @@ async function getFriends(flag, code, player) {
       })
     console.log(orange, player + "_friends.json created successfully.\n");
   }
-  return data[0].Id;
 
 }
 
 // getGodSkins() 
 
 async function getGodSkins(code, god) {
+
+  let godData = await getInfo('gods', null, 1);
   
   const signature = md5(devId + 'getgodskins' + authKey + getTimeStamp());
   let godID = null;
@@ -416,6 +476,110 @@ async function getGodSkins(code, god) {
       if (err) return console.log(red, err);
     })
   console.log(orange, god + "_skins.json created successfully.\n");
-  return data[0].Id;
+
+}
+
+// getMatchHistory() 
+
+async function getMatchHistory(code, player) {
+  
+  const signature = md5(devId + 'getmatchhistory' + authKey + getTimeStamp());
+  
+  let link = smiteAPI + "getmatchhistoryjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + encodeURI(player);
+
+  resp = await fetch(link);
+  data = await resp.json();
+
+  if (data[0] == null) {
+    console.log(red, "\nERROR: Invalid player.\n");
+    return;
+  }
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+    console.log(red, "\nERROR: Player profile set to private.\n");
+    return;
+  }
+
+  console.log(cyan, "[API CALL]: /getmatchhistory");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile(player + "_match_history.json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, player + "_match_history.json created successfully.\n");
+  }
+
+}
+
+// getMatchDetails() 
+
+async function getMatchDetails(code, match_id) {
+  
+  const signature = md5(devId + 'getmatchdetails' + authKey + getTimeStamp());
+  
+  let link = smiteAPI + "getmatchdetailsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + match_id;
+
+  try {
+    resp = await fetch(link);
+    data = await resp.json();
+  }
+  catch (e) {
+    console.log(red, "\nERROR: Invalid match.\n");
+    return;
+  }
+
+  console.log(cyan, "[API CALL]: /getmatchdetails");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile(match_id + ".json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, match_id + ".json created successfully.\n");
+  }
+
+}
+
+/// getGodLeaderboard() /getgodleaderboard[ResponseFormat]/{developerId}/{signature}/{session}/{timestamp}/{godId}/{queue
+
+async function getGodLeaderboard(code, god, queue) {
+
+  let godId = null;
+
+  let godData = await getInfo('gods', null, 1);
+  for (let i = 0; i < godData.length; i++)
+    if (godData[i].Name.toLowerCase() == god.toLowerCase())
+      godId = godData[i].id;
+
+  if (godId == null) {
+    console.log(red, "\nERROR: Invalid God.\n");
+    return;
+  }
+  
+  const signature = md5(devId + 'getgodleaderboard' + authKey + getTimeStamp());
+  
+  let link = smiteAPI + "getgodleaderboardjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + godId + '/' + queue;
+
+  try {
+    resp = await fetch(link);
+    data = await resp.json();
+  }
+  catch (e) {
+    console.log(red, "\nERROR: Invalid God.\n");
+    return;
+  }
+
+  console.log(cyan, "[API CALL]: /getgodleaderboard");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile(god + '_' + queue + "_leaderboard.json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, god + '_' + queue + "_leaderboard.json created successfully.\n");
+  }
 
 }
