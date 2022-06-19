@@ -81,7 +81,7 @@ async function main() {
     // Ping server
     resp = await fetch("https://api.smitegame.com/smiteapi.svc/pingjson");
     data = await resp.json();
-    console.log(orange, data);
+    console.log(orange, '\n' + data);
     console.log(orange, "[Platform]: " + platform)
 
     if (data.indexOf("Ping successful") == -1) 
@@ -523,6 +523,7 @@ async function getMatchDetails(code, match_id) {
   try {
     resp = await fetch(link);
     data = await resp.json();
+    if (data[0] == null) throw 'Error';
   }
   catch (e) {
     console.log(red, "\nERROR: Invalid match.\n");
@@ -542,7 +543,7 @@ async function getMatchDetails(code, match_id) {
 
 }
 
-/// getGodLeaderboard() /getgodleaderboard[ResponseFormat]/{developerId}/{signature}/{session}/{timestamp}/{godId}/{queue
+/// getGodLeaderboard() 
 
 async function getGodLeaderboard(code, god, queue) {
 
@@ -565,6 +566,7 @@ async function getGodLeaderboard(code, god, queue) {
   try {
     resp = await fetch(link);
     data = await resp.json();
+    if (data[0] == null) throw 'Error';
   }
   catch (e) {
     console.log(red, "\nERROR: Invalid God.\n");
