@@ -107,6 +107,8 @@ async function main() {
         console.log("[1] - Get Player Data");
         console.log("[2] - Get Friend/Blocked Data");
         console.log("[3] - Get Player Match History");
+        console.log("[4] - Get Player Status");
+        console.log("[5] - Get God Ranks");
         break;
       }
       case '2': {
@@ -115,6 +117,7 @@ async function main() {
         console.log("[2] - Get Item Data");
         console.log("[3] - Get God Skin Data");
         console.log("[4] - Get God Leaderboard Data");
+        console.log("[5] - Get God Recommended Items");
         break;
       }
       case '3': {
@@ -134,7 +137,7 @@ async function main() {
     firstInput = await prompt("[SELECTION]: ");
     if (firstInput == 'b') continue;
 
-    if (menuInput != 4 || firstInput != '3') {
+    if (!(menuInput == 4 && firstInput == '3') && !(menuInput == 1 && firstInput == '4')) {
       // Secondary Prompt
       console.log(blue, "\nChoose one of the following:");
       console.log("[1] - Save as File");
@@ -151,7 +154,7 @@ async function main() {
     }
 
     // Tertiary Prompt -- godname
-    if (menuInput == 2 && (firstInput == 3 || firstInput == 4)) {
+    if (menuInput == 2 && (firstInput == 3 || firstInput == 4 || firstInput == 5)) {
       console.log (blue, "\nEnter the name of the God:")
       thirdInput = prompt("[NAME]: ");
     }
@@ -186,9 +189,11 @@ async function main() {
     try {
       switch (menuInput) {
         case '1': {
-          if (firstInput == '1') await getPlayer(1, secondInput, thirdInput);
-          else if (firstInput == '2') await getFriends(1, secondInput, thirdInput);
+          if (firstInput == '1') await getPlayer(secondInput, thirdInput);
+          else if (firstInput == '2') await getFriends(secondInput, thirdInput);
           else if (firstInput == '3') await getMatchHistory(secondInput, thirdInput);
+          else if (firstInput == '4') await getPlayerStatus(secondInput, thirdInput);
+          else if (firstInput == '5') await getGodRanks(secondInput, thirdInput);
           else console.log(red, "\nERROR: Invalid option selected\n");
           break;
         }
@@ -197,6 +202,7 @@ async function main() {
           else if (firstInput == '2') await getInfo("items", secondInput);
           else if (firstInput == '3') await getGodSkins(secondInput, thirdInput);
           else if (firstInput == '4') await getGodLeaderboard(secondInput, thirdInput, fourthInput);
+          else if (firstInput == '5') await getGodRecommendedItems(secondInput, thirdInput);
           else console.log(red, "\nERROR: Invalid option selected\n");
           break;
         }
@@ -292,7 +298,7 @@ async function getInfo(info, code, flag) {
 
 // getPlayer()
 
-async function getPlayer(flag, code, player) {
+async function getPlayer(code, player) {
   
   const signature = md5(devId + 'getplayer' + authKey + getTimeStamp());
   
@@ -310,12 +316,10 @@ async function getPlayer(flag, code, player) {
     return;
   }
 
-  if (flag) {
-    console.log(cyan, "[API CALL]: /getplayer");
-    if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
-  }
+  console.log(cyan, "[API CALL]: /getplayer");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
 
-  if ((code == 1 || code == 3) && flag) {
+  if (code == 1 || code == 3) {
     output = JSON.stringify(data);
     fs.writeFile(data[0].Name + ".json", output, function (err) {
         if (err) return console.log(red, err);
@@ -387,7 +391,7 @@ async function getPatchInfo(code) {
   
 }
 
-// getMOTD() /getmotd[ResponseFormat]/{developerId}/{signature}/{session}/{timestamp
+// getMOTD() 
 
 async function getMOTD(code) {
 
@@ -412,7 +416,7 @@ async function getMOTD(code) {
 
 // getFriends()
 
-async function getFriends(flag, code, player) {
+async function getFriends(code, player) {
   
   const signature = md5(devId + 'getfriends' + authKey + getTimeStamp());
   
@@ -430,12 +434,10 @@ async function getFriends(flag, code, player) {
     return;
   }
 
-  if (flag) {
-    console.log(cyan, "[API CALL]: /getfriends");
-    if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
-  }
+  console.log(cyan, "[API CALL]: /getfriends");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
 
-  if ((code == 1 || code == 3) && flag) {
+  if (code == 1 || code == 3) {
     output = JSON.stringify(data);
     fs.writeFile(player + "_friends.json", output, function (err) {
         if (err) return console.log(red, err);
@@ -555,7 +557,7 @@ async function getGodLeaderboard(code, god, queue) {
       godId = godData[i].id;
 
   if (godId == null) {
-    console.log(red, "\nERROR: Invalid God.\n");
+    console.log(red, "\nERROR: God name not found.\n");
     return;
   }
   
@@ -569,7 +571,7 @@ async function getGodLeaderboard(code, god, queue) {
     if (data[0] == null) throw 'Error';
   }
   catch (e) {
-    console.log(red, "\nERROR: Invalid God.\n");
+    console.log(red, "\nERROR: God name not found.\n");
     return;
   }
 
@@ -582,6 +584,107 @@ async function getGodLeaderboard(code, god, queue) {
         if (err) return console.log(red, err);
       })
     console.log(orange, god + '_' + queue + "_leaderboard.json created successfully.\n");
+  }
+
+}
+
+// getGodRecommendedItems()
+
+async function getGodRecommendedItems(code, god) {
+
+  let godId = null;
+
+  let godData = await getInfo('gods', null, 1);
+  for (let i = 0; i < godData.length; i++)
+    if (godData[i].Name.toLowerCase() == god.toLowerCase())
+      godId = godData[i].id;
+
+  if (godId == null) {
+    console.log(red, "\nERROR: God name not found.\n");
+    return;
+  }
+  
+  const signature = md5(devId + 'getgodrecommendeditems' + authKey + getTimeStamp());
+  
+  let link = smiteAPI + "getgodrecommendeditemsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + godId + '/1';
+
+  try {
+    resp = await fetch(link);
+    data = await resp.json();
+    if (data[0] == null) throw 'Error';
+  }
+  catch (e) {
+    console.log(red, "\nERROR: God name not found.\n");
+    return;
+  }
+
+  console.log(cyan, "[API CALL]: /getgodrecommendeditems");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile(god + "_recommended.json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, god + "_recommended.json created successfully.\n");
+  }
+
+}
+
+// getPlayerStatus() 
+
+async function getPlayerStatus(code, player) {
+  
+  const signature = md5(devId + 'getplayerstatus' + authKey + getTimeStamp());
+  
+  let link = smiteAPI + "getplayerstatusjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + encodeURI(player);
+
+  resp = await fetch(link);
+  data = await resp.json();
+
+  if (data[0] == null) {
+    console.log(red, "\nERROR: Invalid player.\n");
+    return;
+  }
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+    console.log(red, "\nERROR: Player profile set to private.\n");
+    return;
+  }
+
+  console.log(cyan, "[API CALL]: /getplayerstatus");
+  console.log(purple, "\nCurrent status of " + player + ": " + data[0].status_string + '\n');
+
+}
+
+// getGodRanks() 
+
+async function getGodRanks(code, player) {
+  
+  const signature = md5(devId + 'getgodranks' + authKey + getTimeStamp());
+  
+  let link = smiteAPI + "getgodranksjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + encodeURI(player);
+
+  resp = await fetch(link);
+  data = await resp.json();
+
+  if (data[0] == null) {
+    console.log(red, "\nERROR: Invalid player.\n");
+    return;
+  }
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+    console.log(red, "\nERROR: Player profile set to private.\n");
+    return;
+  }
+
+  console.log(cyan, "[API CALL]: /getgodranks");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile(player + "_god_ranks.json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, player + "_god_ranks.json created successfully.\n");
   }
 
 }
