@@ -109,6 +109,7 @@ async function main() {
         console.log("[3] - Get Player Match History");
         console.log("[4] - Get Player Status");
         console.log("[5] - Get God Ranks");
+        console.log("[6] - Get Player Achievements");
         break;
       }
       case '2': {
@@ -194,6 +195,7 @@ async function main() {
           else if (firstInput == '3') await getMatchHistory(secondInput, thirdInput);
           else if (firstInput == '4') await getPlayerStatus(secondInput, thirdInput);
           else if (firstInput == '5') await getGodRanks(secondInput, thirdInput);
+          else if (firstInput == '6') await getPlayerAchievements(secondInput, thirdInput);
           else console.log(red, "\nERROR: Invalid option selected\n");
           break;
         }
@@ -271,20 +273,16 @@ async function getInfo(info, code, flag) {
   
   let link = (smiteAPI + 'get' + info + 'json/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + '1')
 
-  if (flag) {
-    resp = await fetch(link);
-    data = await resp.json();
-    return data;
-  }
-  
-  if (code == 2 || code == 3) {
-    console.log(purple, 'URL = ' + link + '\n');
-  }
-
   try {
     resp = await fetch(link);
     data = await resp.json();
   } catch (e) { console.log (red, "\nERROR: Unable to fetch information.\n\n" + e)}
+
+  if (flag) return data;
+  
+  if (code == 2 || code == 3) {
+    console.log(purple, 'URL = ' + link + '\n');
+  }
 
   if (code == 1 || code == 3) {
     output = JSON.stringify(data);
@@ -298,7 +296,7 @@ async function getInfo(info, code, flag) {
 
 // getPlayer()
 
-async function getPlayer(code, player) {
+async function getPlayer(code, player, flag) {
   
   const signature = md5(devId + 'getplayer' + authKey + getTimeStamp());
   
@@ -306,6 +304,8 @@ async function getPlayer(code, player) {
 
   resp = await fetch(link);
   data = await resp.json();
+
+  if (flag) return data;
 
   if (data[0] == null) {
     console.log(red, "\nERROR: Invalid player.\n");
@@ -688,3 +688,44 @@ async function getGodRanks(code, player) {
   }
 
 }
+
+// /getplayerachievements
+
+async function getPlayerAchievements(code, player) {
+  
+  const signature = md5(devId + 'getplayerachievements' + authKey + getTimeStamp());
+
+  playerData = await getPlayer(null, player, 1);
+
+  if (playerData[0].Id == null) {
+    console.log(red, "\nERROR: Invalid player.\n");
+  }
+  else if (playerData[0].ret_msg != null && playerData[0].ret_msg.includes('Player Privacy Flag set')) {
+    console.log(red, "\nERROR: Player profile set to private.\n");
+    return;
+  }
+
+    let link = smiteAPI + "getplayerachievementsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + playerData[0].Id;
+  
+  resp = await fetch(link);
+  data = await resp.json();
+
+
+  console.log(cyan, "[API CALL]: /getplayerachievements");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile(player + "_achievements.json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, player + "_god_ranks.json created successfully.\n");
+  }
+
+}
+
+// /getleagueleaderboard
+// /getleagueseasons
+// /getqueuestats
+// /gettopmatches
+// /getesportsproleaguedetails
