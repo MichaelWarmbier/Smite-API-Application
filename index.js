@@ -111,7 +111,7 @@ async function main() {
         console.log("[4] - Get Player Status");
         console.log("[5] - Get God Ranks");
         console.log("[6] - Get Player Achievements");
-        console.log("[7] - Get Player Recent Game Mode Stats");
+        console.log("[7] - Get Player Game Mode Stats");
         break;
       }
       case '2': {
@@ -275,13 +275,6 @@ function createSession() {
   return smiteAPI + "createsessionjson/" + devId + '/' + signature + '/' + getTimeStamp();
 }
 
-async function playerIsPrivate(player) {
-  let data = await getPlayer(null, player, 1);
-  if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
-    return true;
-  }
-  return false;
-}
 
 /*/////////////////////////////////////*/
 /*/////////////////////////////////////*/
@@ -335,9 +328,8 @@ async function getPlayer(code, player, flag) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  if (playerIsPrivate()) {
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
     console.log(red, "\nERROR: Player profile set to private.\n");
-    return;
   }
 
   console.log(cyan, "[API CALL]: /getplayer");
@@ -453,9 +445,8 @@ async function getFriends(code, player) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  else if (playerIsPrivate()) {
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
     console.log(red, "\nERROR: Player profile set to private.\n");
-    return;
   }
 
   console.log(cyan, "[API CALL]: /getfriends");
@@ -520,9 +511,8 @@ async function getMatchHistory(code, player) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  else if (playerIsPrivate()) {
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
     console.log(red, "\nERROR: Player profile set to private.\n");
-    return;
   }
 
   console.log(cyan, "[API CALL]: /getmatchhistory");
@@ -691,9 +681,8 @@ async function getGodRanks(code, player) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  else if (playerIsPrivate()) {
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
     console.log(red, "\nERROR: Player profile set to private.\n");
-    return;
   }
 
   console.log(cyan, "[API CALL]: /getgodranks");
@@ -720,9 +709,8 @@ async function getPlayerAchievements(code, player) {
   if (playerData[0].Id == null) {
     console.log(red, "\nERROR: Invalid player.\n");
   }
-  else if (playerIsPrivate()) {
+  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
     console.log(red, "\nERROR: Player profile set to private.\n");
-    return;
   }
 
     let link = smiteAPI + "getplayerachievementsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + playerData[0].Id;
@@ -768,15 +756,17 @@ async function getTopMatches(code) {
   
 }
 
-// /getqueuestats
+// getQueueStats()
 
 async function getQueueStats(code, player, queue) {
   
   const signature = md5(devId + 'getqueuestats' + authKey + getTimeStamp());
   
-  let link = smiteAPI + "getqueuestatsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + player + '/' + queue;
+  let link = smiteAPI + "getqueuestatsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + encodeURI(player) + '/' + queue;
 
-  if (playerIsPrivate()) console.log(red, "\nERROR: Player profile set to private.\n");
+  if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+    console.log(red, "\nERROR: Player profile set to private.\n");
+  }
 
   try {
     resp = await fetch(link);
@@ -793,10 +783,10 @@ async function getQueueStats(code, player, queue) {
 
   if (code == 1 || code == 3) {
     output = JSON.stringify(data);
-    fs.writeFile(player + "_gamemode_stats.json", output, function (err) {
+    fs.writeFile(player + '_' + queue + "_gamemode_stats.json", output, function (err) {
         if (err) return console.log(red, err);
       })
-    console.log(orange, player + "_gamemode_stats.json created successfully.\n");
+    console.log(orange, player + '_' + queue + "_gamemode_stats.json created successfully.\n");
   }
 
 }
