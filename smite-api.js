@@ -46,7 +46,8 @@ async function main() {
   let fourthInput = '';
   let validInput = false;
   
-  console.log(orange, "Use ctrl + c to exit at any time.\n");
+  console.log(orange, "Use ctrl + c to exit at any time.");
+  console.log(orange, "See wiki for help: https://tinyurl.com/4zh5pmm4\n");
 
   do {
     // Login Prompt
@@ -110,6 +111,7 @@ async function main() {
         console.log("[4] - Get Player Status");
         console.log("[5] - Get God Ranks");
         console.log("[6] - Get Player Achievements");
+        console.log("[7] - Get Player Recent Game Mode Stats");
         break;
       }
       case '2': {
@@ -125,6 +127,7 @@ async function main() {
         console.log("[b] - Go Back");
         console.log("[1] - Get MOTD Data");
         console.log("[2] - Get Match Details");
+        console.log("[3] - Get Recent Top Matches");
         break;
       }
       case '4': {
@@ -169,13 +172,20 @@ async function main() {
     }
 
     // Quaterynary Prompt -- Queue Type
-    if (menuInput == 2 && firstInput == 4) {
+    if ((menuInput == 2 && firstInput == 4) || (menuInput == 1 && firstInput == 7)) {
       console.log(blue, "\nWhich game mode?");
-      console.log("[1] - Conquest");
-      console.log("[2] - Joust");
-      console.log("[3] - Duel");
+      console.log("[1] - Ranked Conquest");
+      console.log("[2] - Ranked Joust");
+      console.log("[3] - Ranked Duel");
+      if (firstInput == 7) {
+        console.log("[4] - Conquest");
+        console.log("[5] - Joust");
+        console.log("[6] - Arena");
+        console.log("[7] - Assault");
+      }
       fourthInput = prompt("[SELECTION]: ");
-      if (!(fourthInput >= 1 && fourthInput <= 3)) {
+      if ((menuInput == 2 && !(fourthInput >= 1 && fourthInput <= 3)) ||
+         menuInput == 1 && !(fourthInput >= 1 && fourthInput <= 7)) {
         console.log(red, "\nERROR: Invalid option selected.\n");
         continue;
       }
@@ -183,6 +193,10 @@ async function main() {
         case '1': fourthInput = '451'; break;
         case '2': fourthInput = '450'; break;
         case '3': fourthInput = '451'; break;
+        case '4': fourthInput = '426'; break;
+        case '5': fourthInput = '448'; break;
+        case '6': fourthInput = '435'; break;
+        case '7': fourthInput = '445'; break;
       }
     }
     
@@ -196,6 +210,7 @@ async function main() {
           else if (firstInput == '4') await getPlayerStatus(secondInput, thirdInput);
           else if (firstInput == '5') await getGodRanks(secondInput, thirdInput);
           else if (firstInput == '6') await getPlayerAchievements(secondInput, thirdInput);
+          else if (firstInput == '7') await getQueueStats(secondInput, thirdInput, fourthInput);
           else console.log(red, "\nERROR: Invalid option selected\n");
           break;
         }
@@ -211,6 +226,7 @@ async function main() {
         case '3': {
           if (firstInput == '1') await getMOTD(secondInput);
           else if (firstInput == '2') await getMatchDetails(secondInput, thirdInput);
+          else if (firstInput == '3') await getTopMatches(secondInput);
           else console.log(red, "\nERROR: Invalid option selected\n");
           break;
         }
@@ -257,6 +273,14 @@ function getTimeStamp() {
 function createSession() {
   const signature = md5(devId + "createsession" + authKey + getTimeStamp());
   return smiteAPI + "createsessionjson/" + devId + '/' + signature + '/' + getTimeStamp();
+}
+
+async function playerIsPrivate(player) {
+  let data = await getPlayer(null, player, 1);
+  if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+    return true;
+  }
+  return false;
 }
 
 /*/////////////////////////////////////*/
@@ -311,7 +335,7 @@ async function getPlayer(code, player, flag) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+  if (playerIsPrivate()) {
     console.log(red, "\nERROR: Player profile set to private.\n");
     return;
   }
@@ -429,7 +453,7 @@ async function getFriends(code, player) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+  else if (playerIsPrivate()) {
     console.log(red, "\nERROR: Player profile set to private.\n");
     return;
   }
@@ -496,7 +520,7 @@ async function getMatchHistory(code, player) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+  else if (playerIsPrivate()) {
     console.log(red, "\nERROR: Player profile set to private.\n");
     return;
   }
@@ -646,10 +670,6 @@ async function getPlayerStatus(code, player) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
-    console.log(red, "\nERROR: Player profile set to private.\n");
-    return;
-  }
 
   console.log(cyan, "[API CALL]: /getplayerstatus");
   console.log(purple, "\nCurrent status of " + player + ": " + data[0].status_string + '\n');
@@ -671,7 +691,7 @@ async function getGodRanks(code, player) {
     console.log(red, "\nERROR: Invalid player.\n");
     return;
   }
-  else if (data[0].ret_msg != null && data[0].ret_msg.includes('Player Privacy Flag set')) {
+  else if (playerIsPrivate()) {
     console.log(red, "\nERROR: Player profile set to private.\n");
     return;
   }
@@ -689,7 +709,7 @@ async function getGodRanks(code, player) {
 
 }
 
-// /getplayerachievements
+// getPlayerAchievements()
 
 async function getPlayerAchievements(code, player) {
   
@@ -700,7 +720,7 @@ async function getPlayerAchievements(code, player) {
   if (playerData[0].Id == null) {
     console.log(red, "\nERROR: Invalid player.\n");
   }
-  else if (playerData[0].ret_msg != null && playerData[0].ret_msg.includes('Player Privacy Flag set')) {
+  else if (playerIsPrivate()) {
     console.log(red, "\nERROR: Player profile set to private.\n");
     return;
   }
@@ -719,13 +739,64 @@ async function getPlayerAchievements(code, player) {
     fs.writeFile(player + "_achievements.json", output, function (err) {
         if (err) return console.log(red, err);
       })
-    console.log(orange, player + "_god_ranks.json created successfully.\n");
+    console.log(orange, player + "_achievements.json created successfully.\n");
   }
 
 }
 
-// /getleagueleaderboard
-// /getleagueseasons
+// getTopMatches()
+
+async function getTopMatches(code) {
+  
+  const signature = md5(devId + 'gettopmatches' + authKey + getTimeStamp());
+  console.log(cyan, '[API CALL]: /gettopmatches');
+  
+  let link = (smiteAPI + 'gettopmatchesjson' + '/' + devId + '/' + signature + '/' + sID + '/' + getTimeStamp());
+  
+  if (code == 2 || code == 3) console.log(purple, 'URL = ' + link + '\n');
+
+  resp = await fetch(link);
+  data = await resp.json();
+
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile(getTimeStamp() + '_topmatches.json', output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, getTimeStamp() + '_topmatches.json created successfully.\n');
+  }
+  
+}
+
 // /getqueuestats
-// /gettopmatches
-// /getesportsproleaguedetails
+
+async function getQueueStats(code, player, queue) {
+  
+  const signature = md5(devId + 'getqueuestats' + authKey + getTimeStamp());
+  
+  let link = smiteAPI + "getqueuestatsjson/" + devId + '/' + signature + '/' + sID + '/' + getTimeStamp() + '/' + player + '/' + queue;
+
+  if (playerIsPrivate()) console.log(red, "\nERROR: Player profile set to private.\n");
+
+  try {
+    resp = await fetch(link);
+    data = await resp.json();
+    if (data[0] == null) throw 'Error';
+  }
+  catch (e) {
+    console.log(red, "\nERROR: Player name not found.\n");
+    return;
+  }
+
+  console.log(cyan, "[API CALL]: /getqueuestats");
+  if (code == 2 || code == 3) console.log(purple, "URL = " + link + '\n');
+
+  if (code == 1 || code == 3) {
+    output = JSON.stringify(data);
+    fs.writeFile(player + "_gamemode_stats.json", output, function (err) {
+        if (err) return console.log(red, err);
+      })
+    console.log(orange, player + "_gamemode_stats.json created successfully.\n");
+  }
+
+}
