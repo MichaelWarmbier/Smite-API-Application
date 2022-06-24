@@ -16,6 +16,7 @@ async function main() {
   let Input_2 = '';
   let Input_3 = '';
   let Input_4 = '';
+  let menuData = '';
   let validInput = false;
   
   console.log(orange, "Use ctrl + c to exit at any time.");
@@ -36,9 +37,9 @@ async function main() {
 
     // Verify login
     let resp = await fetch(createSession());
-    let data = await resp.json();
-    if (data.ret_msg == "Approved") {
-      sID = await data.session_id;
+    menuData = await resp.json();
+    if (menuData.ret_msg == "Approved") {
+      sID = await menuData.session_id;
       validInput = true;
     }
     else 
@@ -54,11 +55,11 @@ async function main() {
   
     // Ping server
     resp = await fetch("https://api.smitegame.com/smiteapi.svc/pingjson");
-    data = await resp.json();
-    console.log(orange, '\n' + data);
+    menuData = await resp.json();
+    console.log(orange, '\n' + menuData);
     console.log(orange, "[Platform]: " + platform)
 
-    if (data.indexOf("Ping successful") == -1) 
+    if (menuData.indexOf("Ping successful") == -1) 
       console.log(red, "Ping unsuccessful. Unable to access SmiteAPI");
 
     // Prompt user with menu

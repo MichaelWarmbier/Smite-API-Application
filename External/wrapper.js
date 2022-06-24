@@ -32,10 +32,13 @@ global.retrieveAPIData = async function retrieveAPIData(methodName, selection, q
 
   /* Fetch data and be mindful of errors */
   try {
-    link = await determineLinkFormat(methodName, targetName, signature, queue);  // Format Link
-    returnData = await fetchData(link);
-  } catch (e) {
-    console.log(red, '\nERROR: Unable to fetch inforamation. Invalid parameters?\n');
+    link = await determineLinkFormat(methodName, targetName, signature, queue); // Format link
+  } catch (e) { console.log(red, '\n' + e + '\n'); return; }
+  
+  try { returnData = await fetchData(link); } // Fetch data
+  catch (e) { 
+    console.log(red, '\n' + e + '\n');
+    return;
   }
 
   // Handle data based on method. If recursively called, return data.

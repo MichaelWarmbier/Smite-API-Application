@@ -58,8 +58,17 @@ global.createLink = async function createLink(methodName, args) {
 
 /* Retrieves data and returns it as a JavaScript object */
 global.fetchData = async function fetchData(link) {
-  resp = await fetch(link);
-  data = await resp.json();
+  try {
+    resp = await fetch(link);
+    data = await resp.json();
+  } catch (e) { throw 'ERROR: Unable to fetch inforamation.'; }
+
+  if (data[0].ret_msg != null && data[0].ret_msg.includes('Privacy')) 
+  { throw 'ERROR: Player profile set to private.'; return; }
+  
+  if (data[0] == null)
+  { throw 'ERROR: Invalid information (God Name / Player Name / Match ID)'; return; }
+
   return data;
 }
 
@@ -121,6 +130,7 @@ global.determineLinkFormat = async function determineLinkFormat(methodName, targ
     case 'getqueuestats':
       link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), targetName, queue]);
     break;
+    default: throw 'ERROR: Method does not exist. Please contact the developer';
   }
   return link;
 }
