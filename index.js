@@ -6,7 +6,6 @@
 
 require('./External/wrapper.js');
 
-console.log(green, "Smite API Application");
 main();
 
 async function main() {
@@ -19,6 +18,7 @@ async function main() {
   let menuData = '';
   let validInput = false;
   
+  console.log(green, "Smite API Application");
   console.log(orange, "Use ctrl + c to exit at any time.");
   console.log(orange, "See wiki for help: https://tinyurl.com/4zh5pmm4\n");
 
@@ -146,7 +146,7 @@ async function main() {
       Input_3 = prompt("[ID]: ");
     }
 
-    // Quaterynary Prompt; user selects a game mode to pass to API call
+    // Quaternary Prompt; user selects a game mode to pass to API call
     if ((Input_0 == 2 && Input_1 == 4) || (Input_0 == 1 && Input_1 == 7)) {
       console.log(blue, "\nWhich game mode?");
       console.log("[1] - Ranked Conquest");
