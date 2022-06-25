@@ -15,6 +15,7 @@ async function main() {
   let Input_2 = '';
   let Input_3 = '';
   let Input_4 = '';
+  let Input_5 = '';
   let menuData = '';
   let validInput = false;
   
@@ -66,7 +67,7 @@ async function main() {
     console.log(blue, "\nEnter which menu?");
     console.log("[1] - Player Methods");
     console.log("[2] - God and Item Methods");
-    console.log("[3] - Match Methods")
+    console.log("[3] - Match and Season Methods")
     console.log("[4] - Other Methods");
     Input_0 = prompt("[SELECTION]: ");
 
@@ -79,38 +80,39 @@ async function main() {
     switch (Input_0) {
       case '1': {
         console.log("[b] - Go Back");
-        console.log("[1] - Get Player Data");
-        console.log("[2] - Get Friend/Blocked Data");
-        console.log("[3] - Get Player Match History");
-        console.log("[4] - Get Player Status");
-        console.log("[5] - Get God Ranks");
-        console.log("[6] - Get Player Achievements");
-        console.log("[7] - Get Player Game Mode Stats");
+        console.log("[1] - Get Player's Information");
+        console.log("[2] - Get List of Player's Friends/Blocked");
+        console.log("[3] - Get Player's Match History");
+        console.log("[4] - Get Player's Current Status");
+        console.log("[5] - Get Player's God Ranks");
+        console.log("[6] - Get Player's Achievements");
+        console.log("[7] - Get Player's Game Mode Specific Stats");
         break;
       }
       case '2': {
         console.log("[b] - Go Back");
-        console.log("[1] - Get God Data");
-        console.log("[2] - Get Item Data");
-        console.log("[3] - Get God Skin Data");
-        console.log("[4] - Get God Leaderboard Data");
-        console.log("[5] - Get God Recommended Items");
+        console.log("[1] - Get All God Information");
+        console.log("[2] - Get All Item Information");
+        console.log("[3] - Get A God's Skin Information");
+        console.log("[4] - Get A God's Ranked Leaderboard Information");
+        console.log("[5] - Get A God's Recommended Items");
         break;
       }
       case '3': {
         console.log("[b] - Go Back");
-        console.log("[1] - Get MOTD Data");
-        console.log("[2] - Get Match Details");
-        console.log("[3] - Get Recent Top Matches");
-        console.log("[4] - Get Current Pro League Details");
-        console.log("[5] - Get League Seasons");
+        console.log("[1] - Get MOTD Information");
+        console.log("[2] - Get A Specific Match's Details");
+        console.log("[3] - Get Recent Top Match Information");
+        console.log("[4] - Get Current Pro League Statistics");
+        console.log("[5] - Get This Ranked Seasons Rounds");
+        console.log("[6] - Get A Game Mode's Ranked Leaderboard");
         break;
       }
       case '4': {
         console.log("[b] - Go Back");
-        console.log("[1] - Get Server Status");
-        console.log("[2] - Get Patch Info");
-        console.log("[3] - Get Data Used");
+        console.log("[1] - Get Current Servers' Status");
+        console.log("[2] - Get Current Patch's Info");
+        console.log("[3] - Get Your Data Used");
         break;
       }
     }
@@ -149,20 +151,24 @@ async function main() {
     }
 
     // Quaternary Prompt; user selects a game mode to pass to API call
-    if ((Input_0 == 2 && Input_1 == 4) || (Input_0 == 1 && Input_1 == 7) || (Input_0 == 3 && Input_1 == 5)) {
+    if ((Input_0 == 2 && Input_1 == 4) || 
+        (Input_0 == 1 && Input_1 == 7) || 
+        (Input_0 == 3 && Input_1 == 5) ||
+        (Input_0 == 3 && Input_1 == 6)) {
       console.log(blue, "\nWhich game mode?");
       console.log("[1] - Ranked Conquest");
       console.log("[2] - Ranked Joust");
       console.log("[3] - Ranked Duel");
-      if (Input_1 == 7 || Input_1 == 5) {
+      if (Input_0 != 2 && (Input_0 != 3 && Input_1 != 6)) {
         console.log("[4] - Conquest");
         console.log("[5] - Joust");
         console.log("[6] - Arena");
         console.log("[7] - Assault");
       }
       Input_4 = prompt("[SELECTION]: ");
-      if ((Input_0 == 2 && !(Input_4 >= 1 && Input_4 <= 3)) ||
-         Input_0 == 1 && !(Input_4 >= 1 && Input_4 <= 7)) {
+      if (((Input_0 == 2) || (Input_0 == 3 && Input_1 == 6) 
+           && !(Input_4 >= 1 && Input_4 <= 3)) ||
+          (Input_0 == 1 && !(Input_4 >= 1 && Input_4 <= 7))) {
         console.log(red, "\nERROR: Invalid option selected.\n");
         continue;
       }
@@ -175,6 +181,36 @@ async function main() {
         case '6': Input_4 = '435'; break;
         case '7': Input_4 = '445'; break;
       }
+    }
+
+    // Quinary Prompt; user selects a tier
+    if (Input_0 == 3 && Input_1 == 6) {
+      menuData = await retrieveAPIData('getleagueseasons', 4, Input_4, null);
+      menuData = menuData.length;
+      do {
+        console.log(blue, '\nPlease select a rank:')
+        console.log('[1] - Bronze')
+        console.log('[2] - Silver')
+        console.log('[3] - Gold')
+        console.log('[4] - Platinum')
+        console.log('[5] - Diamond')
+        console.log('[6] - Masters')
+        console.log('[7] - Grandmasters')
+        Input_5 = await prompt("[SELECTION]: ");
+        if (Input_5 == 7) Input_5 = 27;
+        else if (Input_5 == 6) Input_5 = 26;
+        else {
+          console.log(blue, '\nPlease select a tier:')
+          console.log('[1] - Tier V')
+          console.log('[2] - Tier IV')
+          console.log('[3] - Tier III')
+          console.log('[4] - Tier II')
+          console.log('[5] - Tier I')
+          Input_5 = (Input_5 - 1) * 5 + parseInt(await prompt("[SELECTION]: "));
+        }
+        if (Input_5 >= 1 && Input_5 <= 27) break;
+        else console.log(red, "\nERROR: Invalid option selected\n");
+      } while (true);
     }
     
     // Input is handled and API is called
@@ -211,6 +247,7 @@ async function main() {
             case '3': await retrieveAPIData('gettopmatches', Input_2, 0, null); break;
             case '4': await retrieveAPIData('getesportsproleaguedetails', Input_2, 0, null); break;
             case '5': await retrieveAPIData('getleagueseasons', Input_2, Input_4, null); break;
+            case '6': await retrieveAPIData('getleagueleaderboard', Input_2, Input_4, menuData, Input_5); break;
             default: console.log(red, '\nERROR: Invalid option selected\n');
           }
           break;

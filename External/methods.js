@@ -63,10 +63,10 @@ global.fetchData = async function fetchData(link) {
     data = await resp.json();
   } catch (e) { throw 'ERROR: Unable to fetch inforamation.'; }
 
-  if (data[0].ret_msg != null && data[0].ret_msg.includes('Privacy')) 
+  if (data[0] != null && data[0].ret_msg != null && data[0].ret_msg.includes('Privacy')) 
   { throw 'ERROR: Player profile set to private.'; return; }
   
-  if (data[0] == null)
+  if (data == null && data[0] == null)
   { throw 'ERROR: Invalid information (God Name / Player Name / Match ID)'; return; }
 
   return data;
@@ -98,7 +98,7 @@ global.handleData = async function handleData(data, selection, link, methodName,
 }
 
 /* Determine the format the link should be in depending on which method is called */
-global.determineLinkFormat = async function determineLinkFormat(methodName, targetName, signature, queue) {
+global.determineLinkFormat = async function determineLinkFormat(methodName, targetName, signature, queue, extraData) {
   let link = '';
   switch(methodName) {
     case 'getitems':
@@ -133,6 +133,9 @@ global.determineLinkFormat = async function determineLinkFormat(methodName, targ
     break;
     case 'getleagueseasons':
       link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), queue]);
+    break;
+    case 'getleagueleaderboard':
+      link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), queue, extraData, targetName]);
     break;
     default: throw 'ERROR: Method does not exist. Please contact the developer';
   }

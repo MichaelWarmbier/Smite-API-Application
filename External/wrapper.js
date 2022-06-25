@@ -5,7 +5,7 @@ require('./methods.js');
 ////////////////////////
 
 
-global.retrieveAPIData = async function retrieveAPIData(methodName, selection, queue, targetName) {
+global.retrieveAPIData = async function retrieveAPIData(methodName, selection, queue, targetName, extraData) {
 
   /* Initialize local variables */
   let link = '';
@@ -32,7 +32,7 @@ global.retrieveAPIData = async function retrieveAPIData(methodName, selection, q
 
   /* Fetch data and be mindful of errors */
   try {
-    link = await determineLinkFormat(methodName, targetName, signature, queue); // Format link
+    link = await determineLinkFormat(methodName, targetName, signature, queue, extraData); // Format link
   } catch (e) { console.log(red, '\n' + e + '\n'); return; }
   
   try { returnData = await fetchData(link); } // Fetch data
