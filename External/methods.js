@@ -120,6 +120,7 @@ global.determineLinkFormat = async function determineLinkFormat(methodName, targ
     case 'getmotd':
     case 'gettopmatches':
     case 'getpatchinfo':
+    case 'getesportsproleaguedetails':
       link = await createLink(methodName, [devId, signature, sID, getTimeStamp()]);
     break;
     case 'getgodskins':
@@ -129,6 +130,9 @@ global.determineLinkFormat = async function determineLinkFormat(methodName, targ
     case 'getgodleaderboard':
     case 'getqueuestats':
       link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), targetName, queue]);
+    break;
+    case 'getleagueseasons':
+      link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), queue]);
     break;
     default: throw 'ERROR: Method does not exist. Please contact the developer';
   }

@@ -102,6 +102,8 @@ async function main() {
         console.log("[1] - Get MOTD Data");
         console.log("[2] - Get Match Details");
         console.log("[3] - Get Recent Top Matches");
+        console.log("[4] - Get Current Pro League Details");
+        console.log("[5] - Get League Seasons");
         break;
       }
       case '4': {
@@ -147,12 +149,12 @@ async function main() {
     }
 
     // Quaternary Prompt; user selects a game mode to pass to API call
-    if ((Input_0 == 2 && Input_1 == 4) || (Input_0 == 1 && Input_1 == 7)) {
+    if ((Input_0 == 2 && Input_1 == 4) || (Input_0 == 1 && Input_1 == 7) || (Input_0 == 3 && Input_1 == 5)) {
       console.log(blue, "\nWhich game mode?");
       console.log("[1] - Ranked Conquest");
       console.log("[2] - Ranked Joust");
       console.log("[3] - Ranked Duel");
-      if (Input_1 == 7) {
+      if (Input_1 == 7 || Input_1 == 5) {
         console.log("[4] - Conquest");
         console.log("[5] - Joust");
         console.log("[6] - Arena");
@@ -207,6 +209,8 @@ async function main() {
             case '1': await retrieveAPIData('getmotd', Input_2, 0, null); break;
             case '2': await retrieveAPIData('getmatchdetails', Input_2, 0, Input_3); break;
             case '3': await retrieveAPIData('gettopmatches', Input_2, 0, null); break;
+            case '4': await retrieveAPIData('getesportsproleaguedetails', Input_2, 0, null); break;
+            case '5': await retrieveAPIData('getleagueseasons', Input_2, Input_4, null); break;
             default: console.log(red, '\nERROR: Invalid option selected\n');
           }
           break;

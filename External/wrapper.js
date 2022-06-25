@@ -15,7 +15,7 @@ global.retrieveAPIData = async function retrieveAPIData(methodName, selection, q
   let signature = await createSignature(methodName);   // Create signature
   if (selection != 4) displayCall(methodName);         // Display Method
 
-  /* Retrieve extra information recursively if necessary. Create new signature to account for delay */
+  /* Retrieve extra information recursively, if necessary. Create new signature to account for delay */
   switch (methodName) {                                
     case 'getgodskins':
     case 'getgodrecommendeditems':
