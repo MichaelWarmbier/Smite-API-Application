@@ -7,6 +7,7 @@ md5 = require('md5');
 fetch = require('node-fetch'); 
 prompt = require('prompt-sync')({sigint: true}); 
 fs = require('fs'); 
+saveData = require('./save_data.json');
 
 /* Secrets (Replit use) */
 global.username = process.env['usrname'];

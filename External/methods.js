@@ -89,9 +89,10 @@ global.handleData = async function handleData(data, selection, link, methodName,
 
   if (selection == 1 || selection == 3) {
     output = JSON.stringify(data);
-    fs.writeFile(fileName, output, function (err) {
+    if (saveData.TargetLocation != '') saveData.TargetLocation = saveData.TargetLocation + '/';
+    fs.writeFile(saveData.TargetLocation + fileName, output, function (err) {
         if (err) return console.log(red, '\nERROR: Unable to create file\n');
-        else console.log(cyan, fileName + " created successfully.\n");
+        else console.log(cyan, saveData.TargetLocation + '/' + fileName + " created successfully.\n");
       })
   }
 

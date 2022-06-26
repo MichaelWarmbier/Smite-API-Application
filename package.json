@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "An application that allows you to access the Smite API with ease.",
   "main": "src/index.js",
-  "bin": "src/index.js",
+  "bin": "./index.js",
   "scripts": {
     "start": "node src/index.js"
   },

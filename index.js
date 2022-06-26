@@ -26,14 +26,22 @@ async function main() {
   do {
     
     // Prompt the user to login
-    input = prompt("Enter your developer ID: "); devId = input;
-    input = prompt("Enter your authentication key: "); authKey = input;
+    console.log("Enter your developer ID or Login: "); 
+    devId = prompt('[LOGIN]: ');
+    console.log('Enter your authentication key or Password: ');
+    authKey = prompt('[PASSWORD]: ');
   
     // Verify ownership (Replit use)
     if (devId == username && authKey == password) {
       console.log(green, "Successfully logged in as owner.");
       devId = s_devId;
       authKey = s_authKey;
+    }
+
+    if (devId == saveData.Login && authKey == saveData.Password) {
+      console.log(green, "Successfully logged in with custom credentials.");
+      devId = saveData.DevId;
+      authKey = saveData.AuthKey;
     }
 
     // Verify login
@@ -69,9 +77,10 @@ async function main() {
     console.log("[2] - God and Item Methods");
     console.log("[3] - Match and Season Methods")
     console.log("[4] - Other Methods");
+    console.log("[5] - Options");
     Input_0 = prompt("[SELECTION]: ");
 
-    if (Input_0 >= 1 && Input_0 <= 4)
+    if (Input_0 >= 1 && Input_0 <= 5)
       console.log(blue, "\nRun which of the following commands?");
     else {
       console.log(red, "\nERROR: Invalid option selected.\n");
@@ -115,9 +124,52 @@ async function main() {
         console.log("[3] - Get Your Data Used");
         break;
       }
+      case '5': {
+        console.log("[b] - Go back");
+        console.log("[1] - Set Custom Login");
+        console.log("[2] - Set Custom Download Path");
+        break;
+      }  
     }
     Input_1 = await prompt("[SELECTION]: ");
     if (Input_1 == 'b') continue;
+
+    // Update Login Prompt
+    if (Input_0 == '5' && Input_1 == '1') {
+      
+      console.log(blue, '\nEnter a username:');
+      Input_0 = prompt('[USERNAME]: ');
+      console.log(blue, '\nEnter a password:');
+      Input_1 = prompt('[PASSWORD]: ');
+      
+      saveData.Login = Input_0;
+      saveData.Password = Input_1;
+      saveData.DevId = devId;
+      saveData.AuthKey = authKey;
+      
+      fs.writeFile('./External/save_data.json', JSON.stringify(saveData), function (err) {
+        if (err) return console.log(red, '\nERROR: Invalid credential names.\n');
+        else console.log(cyan, '\nCredentials updated. You may now use them to login.');
+      });
+      continue;
+    }
+
+    // Update Save Directory Prompt
+    if (Input_0 == 5 && Input_1 == '2') {
+
+      console.log(blue, '\nEnter a new directory to save to:');
+      Input_0 = prompt('[DIRECTORY]: ');
+
+      saveData.TargetLocation = Input_0;
+
+      if (fs.existsSync(Input_0)) {
+        fs.writeFile('./External/save_data.json', JSON.stringify(saveData), function (err) {
+          if (err) return console.log(red, '\nERROR: Unable to updated save data');
+          else console.log(cyan, '\nDirectory updated. Files will now save to ' + Input_0);
+        });
+      }
+      continue;
+    }
 
     if (!(Input_0 == 4 && Input_1 == '3') && !(Input_0 == 1 && Input_1 == '4')) {
       
