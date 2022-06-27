@@ -19,7 +19,7 @@ async function main() {
   let menuData = '';
   let validInput = false;
   
-  console.log(green, "Smite API Application V1.2.1");
+  console.log(green, "Smite API Application V1.3.0");
   console.log(orange, "Use ctrl + c to exit at any time.");
   console.log(orange, "See wiki for help: https://tinyurl.com/4zh5pmm4\n");
 
