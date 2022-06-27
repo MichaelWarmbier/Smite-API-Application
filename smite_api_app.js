@@ -85,6 +85,8 @@ async function main() {
       case 13: displayLanguage = 'Turkish / Turecki'; break;
     }
     console.log(orange, '[RETURN LANGUAGE]: ' + displayLanguage);
+    if (format == 'xml') console.log(orange, '[RETURN FORMAT]: XML');
+    else console.log(orange, '[RETURN FORMAT]: JSON');
 
     if (menuData.indexOf("Ping successful") == -1) 
       console.log(red, "Ping unsuccessful. Unable to access SmiteAPI");
@@ -95,12 +97,13 @@ async function main() {
     console.log("[2] - God and Item Methods");
     console.log("[3] - Match and Season Methods")
     console.log("[4] - Other Methods");
-    console.log("[5] - Options");
+    console.log("[5] - Preferences");
     console.log("[6] - Credits");
     Input_0 = prompt("[SELECTION]: ");
 
     if (Input_0 >= 1 && Input_0 <= 6) {
-      if (Input_0 != 6) console.log(blue, "\nRun which of the following commands?");
+      if (Input_0 == 5) console.log(blue, "\nChange which of the following?")
+      else if (Input_0 != 6) console.log(blue, "\nRun which of the following commands?");
     }
     else {
       console.log(red, "\nERROR: Invalid option selected.\n");
@@ -145,11 +148,12 @@ async function main() {
         break;
       }
       case '5': {
-        console.log(red, '\n[WARNING]: If you\'re accessing this app through npx, these options will have no effect and may even cause errors.\n')
+        console.log(red, '\n[WARNING]: If you\'re accessing this app through npx, these selections may have no effect and may even cause errors.\n')
         console.log("[b] - Go back");
         console.log("[1] - Set Custom Login");
         console.log("[2] - Set Custom Download Path");
-        console.log("[3] - Set Return Language (for supported methods)")
+        console.log("[3] - Set Return Language (for supported methods)");
+        console.log("[4] - Set return format");
         break;
       }  
       case '6': displayCredits(); continue; break;
@@ -169,11 +173,8 @@ async function main() {
       saveData.Password = Input_1;
       saveData.DevId = devId;
       saveData.AuthKey = authKey;
-      
-      fs.writeFile('./External/save_data.json', JSON.stringify(saveData), function (err) {
-        if (err) return console.log(red, '\nERROR: Invalid credential names.\n');
-        else console.log(cyan, '\nCredentials updated. You may now use them to login.');
-      });
+
+      save('Credentials updated. You may now use them to login.');
       continue;
     }
 
@@ -185,12 +186,8 @@ async function main() {
 
       saveData.TargetLocation = Input_0;
 
-      if (fs.existsSync(Input_0)) {
-        fs.writeFile('./External/save_data.json', JSON.stringify(saveData), function (err) {
-          if (err) return console.log(red, '\nERROR: Unable to update save data');
-          else console.log(cyan, '\nDirectory updated. Files will now save to ' + Input_0);
-        });
-      }
+      if (fs.existsSync(Input_0))
+        save('Directory updated. Files will now save to ' + Input_0);
       continue;
     }
 
@@ -225,10 +222,26 @@ async function main() {
       }
       saveData.Language = language;
       
-      fs.writeFile('./External/save_data.json', JSON.stringify(saveData), function (err) {
-        if (err) return console.log(red, '\nERROR: Unable to update save data.\n');
-        else console.log(cyan, '\nReturn language updated.');
-      });
+      save('Return language updated.');
+      continue;
+    }
+
+    // Update Return Format
+    if (Input_0 == '5' && Input_1 == '4') {
+
+      console.log(blue, '\nSelect an option:');
+      console.log("[1] - JSON");
+      console.log("[2] - XML");
+      Input_0 = prompt('[SELECTION]: ');
+
+      switch (Input_0) {
+        case '1': format = 'json'; break;
+        case '2': format = 'xml'; break;
+        default: console.log(red, '\nERROR: Invalid option selected.\n');
+      }
+      saveData.Format = format;
+
+      save('Return format updated.');
       continue;
     }
 

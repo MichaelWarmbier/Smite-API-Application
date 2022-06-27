@@ -1,11 +1,11 @@
 {
-  "name": "smite-api",
+  "name": "smite_api_app",
   "version": "1.0.0",
   "description": "An application that allows you to access the Smite API with ease.",
-  "main": "src/index.js",
-  "bin": "./index.js",
+  "main": "src/smite_api_app.js",
+  "bin": "./smite_api_app.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node smite_api_app.js"
   },
   "repository": {
     "type": "git",

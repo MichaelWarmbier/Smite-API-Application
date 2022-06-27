@@ -27,6 +27,7 @@ global.cyan = "\n\x1b[36m%s\x1b[0m"
 global.smiteAPI = "https://api.smitegame.com/smiteapi.svc/";
 global.platform = "PC";
 global.language = saveData.Language;
+global.format = saveData.Format;
 global.input = null; 
 global.devId = null; 
 global.authKey = null;

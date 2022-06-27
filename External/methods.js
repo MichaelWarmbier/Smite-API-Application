@@ -50,7 +50,7 @@ global.displayCall = async function displayCall(methodName) {
 
 /* Creates a link in the format required with optional arguments */
 global.createLink = async function createLink(methodName, args) {
-  let link = smiteAPI + methodName + 'json';
+  let link = smiteAPI + methodName + format;
   for (let argIndex = 0; argIndex < args.length; argIndex++) 
     link += '/' + args[argIndex];
   return link;
@@ -60,8 +60,14 @@ global.createLink = async function createLink(methodName, args) {
 global.fetchData = async function fetchData(link) {
   try {
     resp = await fetch(link);
+  } catch (e) { 
+    throw 'ERROR: Unable to fetch inforamation.\nLink: ' + link; 
+  }
+
+  if (format == 'json')
     data = await resp.json();
-  } catch (e) { throw 'ERROR: Unable to fetch inforamation.'; }
+  else 
+    data = await resp.text();
 
   if (data[0] != null && data[0].ret_msg != null && data[0].ret_msg.includes('Privacy')) 
   { throw 'ERROR: Player profile set to private.'; return; }
@@ -75,7 +81,7 @@ global.fetchData = async function fetchData(link) {
 /* Determines how to handle the data after retrieval */
 global.handleData = async function handleData(data, selection, link, methodName, specifics) {
 
-  let fileName = methodName + '_' + getTimeStamp() + '_' + specifics + '_.json';
+  let fileName = methodName + '_' + getTimeStamp() + '_' + specifics + '_.' + format;
 
   if (methodName == 'getplayerstatus') {
     console.log(green, '\nPlayer Status: ' + data[0].status_string + '\n');
@@ -88,7 +94,10 @@ global.handleData = async function handleData(data, selection, link, methodName,
     console.log(purple, "URL = " + link + '\n');
 
   if (selection == 1 || selection == 3) {
-    output = JSON.stringify(data);
+    
+    if (format == 'json') output = JSON.stringify(data);
+    else output = data;
+    
     if (saveData.TargetLocation != '') saveData.TargetLocation = saveData.TargetLocation + '/';
     fs.writeFile(saveData.TargetLocation + fileName, output, function (err) {
         if (err) return console.log(red, '\nERROR: Unable to create file\n');
@@ -172,4 +181,12 @@ global.displayCredits = async function displayCredits() {
   console.log(purple, '\nDeciated to Sara, for always supporting me. ♥\n\n')
   console.log(blue, 'http://michaelwarmbier.com | Copyright 2022\n\n');
     console.log(orange, '---------------\n');
+}
+
+/* Saves current object to save data */
+  global.save = async function save(save_message) {
+  fs.writeFile('./External/save_data.json', JSON.stringify(saveData), function (err) {
+      if (err) return console.log(red, '\nERROR: Unable to update save data.\n');
+      else console.log(cyan, '\n' + save_message);
+  });
 }
