@@ -104,7 +104,7 @@ global.determineLinkFormat = async function determineLinkFormat(methodName, targ
   switch(methodName) {
     case 'getitems':
     case 'getgods':
-      link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), '1']);
+      link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), language]);
     break;
     case 'getplayerstatus':
     case 'getgodranks':
@@ -126,7 +126,7 @@ global.determineLinkFormat = async function determineLinkFormat(methodName, targ
     break;
     case 'getgodskins':
     case 'getgodrecommendeditems':
-      link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), targetName, '1']);
+      link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), targetName, language]);
     break;
     case 'getgodleaderboard':
     case 'getqueuestats':
@@ -158,4 +158,18 @@ global.retrievePlayerID = async function retrievePlayerID(playerName) {
   let player = await retrieveAPIData('getplayer', 4, 0, 'kirbout');
   playerId = player[0].Id;
   return playerId;
+}
+
+/* Condenses credits into one function */
+global.displayCredits = async function displayCredits() {
+  console.log(orange, '\n---------------');
+  console.log(orange, '\n\nSmite API Application\n');
+  console.log(blue, 'Programmed by: Michael Warmbier');
+  console.log(blue, 'Smite owned by: Hi-Rez Studios/Titan Forge Games');
+  console.log(blue, 'Programmed with: Node.js');
+  console.log(blue, 'Programmed with: Replit');
+  console.log(blue, 'Relient on: md5.js, node-fetch, prompt-sync and fs libraries.');
+  console.log(purple, '\nDeciated to Sara, for always supporting me. ♥\n\n')
+  console.log(blue, 'http://michaelwarmbier.com | Copyright 2022\n\n');
+    console.log(orange, '---------------\n');
 }

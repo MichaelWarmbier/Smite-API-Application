@@ -45,13 +45,17 @@ async function main() {
     }
 
     // Verify login
-    let resp = await fetch(createSession());
-    menuData = await resp.json();
+    try {
+      let resp = await fetch(createSession());
+      menuData = await resp.json();
+    } catch (e) {
+      console.log(red, "\nERROR: API unresponsive.\n");
+    }
     if (menuData.ret_msg == "Approved") {
       sID = await menuData.session_id;
       validInput = true;
     }
-    else 
+    else if (menuData != null)
       console.log(red, "\nERROR: Invalid credentials.\n")
     
   } while(!validInput) 
@@ -66,7 +70,21 @@ async function main() {
     resp = await fetch("https://api.smitegame.com/smiteapi.svc/pingjson");
     menuData = await resp.json();
     console.log(orange, '\n' + menuData);
-    console.log(orange, "[Platform]: " + platform)
+    console.log(orange, '[Platform]: ' + platform)
+    let displayLanguage = '';
+    switch (language) {
+      case 1: displayLanguage = 'English'; break;
+      case 2: displayLanguage = 'German / Deutsch'; break;
+      case 3: displayLanguage = 'French / Français'; break;
+      case 5: displayLanguage = 'Chinese / 中国人'; break;
+      case 7: displayLanguage = 'Spanish / Español'; break;
+      case 9: displayLanguage = 'Latin American Spanish / Español latinoamericano'; break;
+      case 10: displayLanguage = 'Portugese / Português'; break;
+      case 11: displayLanguage = 'Russian / Русский'; break;
+      case 12: displayLanguage = 'Polish / Polskie'; break;
+      case 13: displayLanguage = 'Turkish / Turecki'; break;
+    }
+    console.log(orange, '[RETURN LANGUAGE]: ' + displayLanguage);
 
     if (menuData.indexOf("Ping successful") == -1) 
       console.log(red, "Ping unsuccessful. Unable to access SmiteAPI");
@@ -78,10 +96,12 @@ async function main() {
     console.log("[3] - Match and Season Methods")
     console.log("[4] - Other Methods");
     console.log("[5] - Options");
+    console.log("[6] - Credits");
     Input_0 = prompt("[SELECTION]: ");
 
-    if (Input_0 >= 1 && Input_0 <= 5)
-      console.log(blue, "\nRun which of the following commands?");
+    if (Input_0 >= 1 && Input_0 <= 6) {
+      if (Input_0 != 6) console.log(blue, "\nRun which of the following commands?");
+    }
     else {
       console.log(red, "\nERROR: Invalid option selected.\n");
       continue;
@@ -125,11 +145,14 @@ async function main() {
         break;
       }
       case '5': {
+        console.log(red, '\n[WARNING]: If you\'re accessing this app through npx, these options will have no effect and may even cause errors.\n')
         console.log("[b] - Go back");
         console.log("[1] - Set Custom Login");
         console.log("[2] - Set Custom Download Path");
+        console.log("[3] - Set Return Language (for supported methods)")
         break;
       }  
+      case '6': displayCredits(); continue; break;
     }
     Input_1 = await prompt("[SELECTION]: ");
     if (Input_1 == 'b') continue;
@@ -155,23 +178,62 @@ async function main() {
     }
 
     // Update Save Directory Prompt
-    if (Input_0 == 5 && Input_1 == '2') {
+    if (Input_0 == '5' && Input_1 == '2') {
 
       console.log(blue, '\nEnter a new directory to save to:');
-      Input_0 = prompt('[DIRECTORY]: ');
+      Input_0 = prompt('[PATH]: ');
 
       saveData.TargetLocation = Input_0;
 
       if (fs.existsSync(Input_0)) {
         fs.writeFile('./External/save_data.json', JSON.stringify(saveData), function (err) {
-          if (err) return console.log(red, '\nERROR: Unable to updated save data');
+          if (err) return console.log(red, '\nERROR: Unable to update save data');
           else console.log(cyan, '\nDirectory updated. Files will now save to ' + Input_0);
         });
       }
       continue;
     }
 
-    if (!(Input_0 == 4 && Input_1 == '3') && !(Input_0 == 1 && Input_1 == '4')) {
+    // Update Return Language
+    if (Input_0 == '5' && Input_1 == '3') {
+
+      console.log(blue, '\nSelect a language:');
+      console.log("[1] - Set Custom Login");
+      console.log("[2] - German / Deutsch");
+      console.log("[3] - French / Français");
+      console.log("[4] - Chinese / 中国人");
+      console.log("[5] - Spanish / Español");
+      console.log("[6] - Latin American Spanish / Español latinoamericano");
+      console.log("[7] - Portugese / Português");
+      console.log("[8] - Russian / Русский");
+      console.log("[9] - Polish / Polskie");
+      console.log("[10] - Turkish / Turecki");
+      Input_0 = prompt('[SELECTION]: ');
+      
+      switch (Input_0) {
+        case '1': language = 1; break;
+        case '2': language = 2; break;
+        case '3': language = 3; break;
+        case '4': language = 5; break;
+        case '5': language = 7; break;
+        case '6': language = 9; break;
+        case '7': language = 10; break;
+        case '8': language = 11; break;
+        case '9': language = 12; break;
+        case '10': language = 13; break;
+        default: console.log(red, '\nERROR: Invalid option selected.\n');
+      }
+      saveData.Language = language;
+      
+      fs.writeFile('./External/save_data.json', JSON.stringify(saveData), function (err) {
+        if (err) return console.log(red, '\nERROR: Unable to update save data.\n');
+        else console.log(cyan, '\nReturn language updated.');
+      });
+      continue;
+    }
+
+    if (Input_0 != 5 &&!(Input_0 == 4 && Input_1 == '3') 
+        && !(Input_0 == 1 && Input_1 == '4')) {
       
       // Secondary Prompt; use selects what to do with data
       console.log(blue, "\nChoose one of the following:");
