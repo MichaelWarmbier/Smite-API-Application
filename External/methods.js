@@ -122,6 +122,7 @@ global.determineLinkFormat = async function determineLinkFormat(methodName, targ
     case 'getplayer':
     case 'getmatchhistory':
     case 'getplayerachievements':
+    case 'getplayeridbyname':
       link = await createLink(methodName, [devId, signature, sID, getTimeStamp(), targetName]);
     break;
     case 'gethirezserverstatus':
@@ -164,8 +165,8 @@ global.retrieveGodID = async function retrieveGodID(godName) {
 
 /* Retrieve a specific players ID */
 global.retrievePlayerID = async function retrievePlayerID(playerName) {
-  let player = await retrieveAPIData('getplayer', 4, 0, 'kirbout');
-  playerId = player[0].Id;
+  let player = await retrieveAPIData('getplayeridbyname', 4, 0, playerName);
+  playerId = player[0].player_id;
   return playerId;
 }
 

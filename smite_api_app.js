@@ -70,7 +70,7 @@ async function main() {
     resp = await fetch("https://api.smitegame.com/smiteapi.svc/pingjson");
     menuData = await resp.json();
     console.log(orange, '\n' + menuData);
-    console.log(orange, '[Platform]: ' + platform)
+    console.log(orange, 'Results support all platforms (Xbox/Switch/Steam/PS4)');
     let displayLanguage = '';
     switch (language) {
       case 1: displayLanguage = 'English'; break;
@@ -113,11 +113,11 @@ async function main() {
       case '1': {
         console.log("[b] - Go Back");
         console.log("[1] - Get Player's Information");
-        console.log("[2] - Get List of Player's Friends/Blocked");
+        console.log("[2] - Get List of Player's Friends/Blocked [Steam/PC Only]");
         console.log("[3] - Get Player's Match History");
         console.log("[4] - Get Player's Current Status");
         console.log("[5] - Get Player's God Ranks");
-        console.log("[6] - Get Player's Achievements");
+        console.log("[6] - Get Player's Accolades");
         console.log("[7] - Get Player's Game Mode Specific Stats");
         break;
       }
@@ -195,7 +195,7 @@ async function main() {
     if (Input_0 == '5' && Input_1 == '3') {
 
       console.log(blue, '\nSelect a language:');
-      console.log("[1] - Set Custom Login");
+      console.log("[1] - English");
       console.log("[2] - German / Deutsch");
       console.log("[3] - French / Français");
       console.log("[4] - Chinese / 中国人");
@@ -261,6 +261,8 @@ async function main() {
     if (Input_0 == 1) {
       console.log (blue, "\nEnter the name of the player:")
       Input_3 = prompt("[NAME]: ");
+      
+      Input_3 = await retrievePlayerID(Input_3);
     }
 
     // Tertiary Prompt; user enters a God name
@@ -291,11 +293,12 @@ async function main() {
         console.log("[5] - Joust");
         console.log("[6] - Arena");
         console.log("[7] - Assault");
+        console.log("[8] - Slash");
       }
       Input_4 = prompt("[SELECTION]: ");
       if (((Input_0 == 2) || (Input_0 == 3 && Input_1 == 6) 
            && !(Input_4 >= 1 && Input_4 <= 3)) ||
-          (Input_0 == 1 && !(Input_4 >= 1 && Input_4 <= 7))) {
+          (Input_0 == 1 && !(Input_4 >= 1 && Input_4 <= 8))) {
         console.log(red, "\nERROR: Invalid option selected.\n");
         continue;
       }
@@ -307,6 +310,7 @@ async function main() {
         case '5': Input_4 = '448'; break;
         case '6': Input_4 = '435'; break;
         case '7': Input_4 = '445'; break;
+        case '8': Input_4 = '10189'; break;
       }
     }
 

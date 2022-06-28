@@ -23,11 +23,6 @@ global.retrieveAPIData = async function retrieveAPIData(methodName, selection, q
       targetName = await retrieveGodID(targetName);
       signature = await createSignature(methodName);
     break;
-    case 'getplayerachievements':
-    case 'getqueuestats':
-      targetName = await retrievePlayerID(targetName);
-      signature = await createSignature(methodName);
-    break;
   }
 
   /* Fetch data and be mindful of errors */
