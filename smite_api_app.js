@@ -78,7 +78,7 @@ async function main() {
       case 3: displayLanguage = 'French / Français'; break;
       case 5: displayLanguage = 'Chinese / 中国人'; break;
       case 7: displayLanguage = 'Spanish / Español'; break;
-      case 9: displayLanguage = 'Latin American Spanish / Español latinoamericano'; break;
+      case 9: displayLanguage = 'Latin American Spanish / Español Latinoamericano'; break;
       case 10: displayLanguage = 'Portugese / Português'; break;
       case 11: displayLanguage = 'Russian / Русский'; break;
       case 12: displayLanguage = 'Polish / Polskie'; break;
@@ -153,7 +153,7 @@ async function main() {
         console.log("[1] - Set Custom Login");
         console.log("[2] - Set Custom Download Path");
         console.log("[3] - Set Return Language (for supported methods)");
-        console.log("[4] - Set return format");
+        console.log("[4] - Set Return Format");
         break;
       }  
       case '6': displayCredits(); continue; break;
