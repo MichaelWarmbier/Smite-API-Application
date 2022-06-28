@@ -179,7 +179,7 @@ global.displayCredits = async function displayCredits() {
   console.log(blue, 'Programmed with: Node.js');
   console.log(blue, 'Programmed with: Replit');
   console.log(blue, 'Relient on: md5.js, node-fetch, prompt-sync and fs libraries.');
-  console.log(purple, '\nDeciated to Sara, for always supporting me. ♥\n\n')
+  console.log(purple, '\nDedicated to Sara, for always supporting me. ♥\n\n')
   console.log(blue, 'http://michaelwarmbier.com | Copyright 2022\n\n');
     console.log(orange, '---------------\n');
 }
