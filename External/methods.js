@@ -166,7 +166,7 @@ global.retrieveGodID = async function retrieveGodID(godName) {
 /* Retrieve a specific players ID */
 global.retrievePlayerID = async function retrievePlayerID(playerName) {
   let player = await retrieveAPIData('getplayeridbyname', 4, 0, playerName);
-  playerId = player[0].player_id;
+  playerId = await player[0].player_id;
   return playerId;
 }
 

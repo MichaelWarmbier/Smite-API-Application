@@ -20,8 +20,10 @@ global.retrieveAPIData = async function retrieveAPIData(methodName, selection, q
     case 'getgodskins':
     case 'getgodrecommendeditems':
     case 'getgodleaderboard':
+      format = 'json';
       targetName = await retrieveGodID(targetName);
       signature = await createSignature(methodName);
+      if (saveData.Format == 'xml') format = 'xml';
     break;
   }
 

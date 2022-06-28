@@ -261,8 +261,10 @@ async function main() {
     if (Input_0 == 1) {
       console.log (blue, "\nEnter the name of the player:")
       Input_3 = prompt("[NAME]: ");
-      
+
+      format = 'json';
       Input_3 = await retrievePlayerID(Input_3);
+      if (saveData.Format == 'xml') format = 'xml';
     }
 
     // Tertiary Prompt; user enters a God name
