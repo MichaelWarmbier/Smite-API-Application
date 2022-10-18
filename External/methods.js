@@ -12,7 +12,7 @@ global.getTimeStamp = function getTimeStamp() {
   let year, month, day, hour, minute, second;
 
   year = date.getUTCFullYear();
-  if (date.getUTCMonth() < 10) month = '0' + (date.getUTCMonth() + 1); 
+  if (date.getUTCMonth() < 9) month = '0' + (date.getUTCMonth() + 1); 
   else month = date.getUTCMonth() + 1;
   if (date.getUTCDate() < 10) day = '0' + date.getUTCDate(); 
   else day = date.getUTCDate();
